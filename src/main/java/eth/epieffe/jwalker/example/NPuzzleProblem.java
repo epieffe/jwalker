@@ -16,45 +16,50 @@ public class NPuzzleProblem implements Problem<NPuzzle> {
     public List<Move<NPuzzle>> getMoves(NPuzzle config) {
         byte emptyY = config.getEmptyY();
         byte emptyX = config.getEmptyX();
+        byte length = config.getLength();
         List<Move<NPuzzle>> moveList = new ArrayList<>(4);
         if (emptyY > 0) {
-            /*move up*/
-            byte[][] newTable = copyTable(config);
-            newTable[emptyY][emptyX] = config.getCell((byte) (emptyY - 1), emptyX);
-            newTable[emptyY - 1][emptyX] = config.getCell(emptyY, emptyX);
-            NPuzzle newConfig = new NPuzzle(newTable, emptyX, (byte) (emptyY - 1));
-            Move<NPuzzle> move = new Move<>("UP", 1, newConfig);
-            moveList.add(move);
+            // move up
+            byte[] newTable = copyTable(config);
+            int from = (emptyY - 1) * length + emptyX;
+            int to = emptyY * length + emptyX;
+            swap(newTable, from, to);
+            moveList.add(new Move<>("UP", 1, new NPuzzle(newTable, length, emptyX, (byte) (emptyY - 1))));
         }
-        if (emptyY < config.getLength() - 1) {
-            /*move down*/
-            byte[][] newTable = copyTable(config);
-            newTable[emptyY][emptyX] = config.getCell((byte) (emptyY + 1), emptyX);
-            newTable[emptyY + 1][emptyX] = config.getCell(emptyY, emptyX);
-            NPuzzle newConfig = new NPuzzle(newTable, emptyX, (byte) (emptyY + 1));
-            Move<NPuzzle> move = new Move<>("DOWN", 1, newConfig);
-            moveList.add(move);
+        if (emptyY < length - 1) {
+            // move down
+            byte[] newTable = copyTable(config);
+            int from = (emptyY + 1) * length + emptyX;
+            int to = emptyY * length + emptyX;
+            swap(newTable, from, to);
+            moveList.add(new Move<>("DOWN", 1, new NPuzzle(newTable, length, emptyX, (byte) (emptyY + 1))));
         }
         if (emptyX > 0) {
-            /*move left*/
-            byte[][] newTable = copyTable(config);
-            newTable[emptyY][emptyX] = config.getCell(emptyY, (byte) (emptyX - 1));
-            newTable[emptyY][emptyX - 1] = config.getCell(emptyY, emptyX);
-            NPuzzle newConfig = new NPuzzle(newTable, (byte) (emptyX - 1), emptyY);
-            Move<NPuzzle> move = new Move<>("LEFT", 1, newConfig);
-            moveList.add(move);
+            // move left
+            byte[] newTable = copyTable(config);
+            int from = emptyY * length + (emptyX - 1);
+            int to = emptyY * length + emptyX;
+            swap(newTable, from, to);
+            moveList.add(new Move<>("LEFT", 1, new NPuzzle(newTable, length, (byte) (emptyX - 1), emptyY)));
         }
-        if (emptyX < config.getLength() - 1) {
-            /*move right*/
-            byte[][] newTable = copyTable(config);
-            newTable[emptyY][emptyX] = config.getCell(emptyY, (byte) (emptyX + 1));
-            newTable[emptyY][emptyX + 1] = config.getCell(emptyY, emptyX);
-            NPuzzle newConfig = new NPuzzle(newTable, (byte) (emptyX + 1), emptyY);
-            Move<NPuzzle> move = new Move<>("RIGHT", 1, newConfig);
-            moveList.add(move);
+        if (emptyX < length - 1) {
+            // move right
+            byte[] newTable = copyTable(config);
+            int from = emptyY * length + (emptyX + 1);
+            int to = emptyY * length + emptyX;
+            swap(newTable, from, to);
+            moveList.add(new Move<>("RIGHT", 1, new NPuzzle(newTable, length, (byte) (emptyX + 1), emptyY)));
         }
+
         return moveList;
     }
+
+    private void swap(byte[] array, int i, int j) {
+        byte temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+
 
     @Override
     public boolean isSolved(NPuzzle config) {
@@ -75,12 +80,12 @@ public class NPuzzleProblem implements Problem<NPuzzle> {
         return true;
     }
 
-    private byte[][] copyTable(NPuzzle config) {
+    private byte[] copyTable(NPuzzle config) {
         int length = config.getLength();
-        byte[][] newTable = new byte[length][length];
+        byte[] newTable = new byte[length * length];
         for (byte i = 0; i < length; i++) {
             for (byte j = 0; j < length; j++) {
-                newTable[i][j] = config.getCell(i, j);
+                newTable[i * length + j] = config.getCell(i, j);
             }
         }
         return newTable;

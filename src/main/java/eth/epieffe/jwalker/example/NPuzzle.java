@@ -1,6 +1,6 @@
 package eth.epieffe.jwalker.example;
 
-import java.util.*;
+import java.util.Arrays;
 
 /**
  * Rappresenta un'istanza del gioco NPuzzle.
@@ -11,76 +11,63 @@ import java.util.*;
 public class NPuzzle {
 
     public static final NPuzzleProblem PROBLEM = new NPuzzleProblem();
-
-    private final byte[][] table;
+    private final byte[] table;
+    private final byte length;
     private final byte emptyX;
     private final byte emptyY;
 
-    public static NPuzzle newInstance(byte[][] table) {
-        if (table.length < 1 || table[0].length != table.length) {
+    public static NPuzzle newInstance(byte[][] matrix) {
+        if (matrix.length < 1 || matrix[0].length != matrix.length) {
             throw new IllegalArgumentException("invalid table size");
         }
+        byte length = (byte) matrix.length;
+        byte[] flatTable = new byte[length * length];
         byte emptyX = -1;
         byte emptyY = -1;
-        for (byte i = 0; i < table.length; i++) {
-            for (byte j = 0; j < table.length; j++) {
-                if (table[i][j] >= table.length * table.length) {
+
+        for (byte i = 0; i < length; i++) {
+            for (byte j = 0; j < length; j++) {
+                byte value = matrix[i][j];
+                if (value >= length * length) {
                     throw new IllegalArgumentException("invalid table: cell value too high");
                 }
-                if (table[i][j] < 1) {
+                if (value < 1) {
                     if (emptyX >= 0 || emptyY >= 0) {
                         throw new IllegalArgumentException("invalid table: more than one empty cell");
                     }
                     emptyX = j;
                     emptyY = i;
                 }
+                flatTable[i * length + j] = value;
             }
         }
         if (emptyX < 0 || emptyY < 0) {
             throw new IllegalArgumentException("invalid table: no empty cell");
         }
-        return new NPuzzle(table, emptyX, emptyY);
+        return new NPuzzle(flatTable, length, emptyX, emptyY);
     }
 
     /**
-     * @param t: matrice che rappresenta la configurazione.
+     * @param t: array che rappresenta la configurazione.
+     * @param l: dimensione del lato del puzzle (es. 3 per un 3x3).
      * @param x: riga della cella vuota.
      * @param y: colonna della cella vuota.
-     *           si assume che la matrice rappresenti una configurazione valida
+     *           Si assume che la matrice rappresenti una configurazione valida
      *           e che x e y abbiano valori corretti.
      */
-    public NPuzzle(byte[][] t, byte x, byte y) {
-        table = t;
-        emptyX = x;
-        emptyY = y;
+    public NPuzzle(byte[] t, byte l, byte x, byte y) {
+        this.table = t;
+        this.length = l;
+        this.emptyX = x;
+        this.emptyY = y;
     }
 
-    public int getLength() {
-        return table.length;
+    public byte getLength() {
+        return length;
     }
 
     public byte getCell(byte row, byte col) {
-        return table[row][col];
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof NPuzzle)) {
-            return false;
-        }
-        NPuzzle other = (NPuzzle) o;
-        if (other.table.length != table.length) {
-            return false;
-        }
-        for (byte i = 0; i < table.length; i++) {
-            for (byte j = 0; j < table.length; j++) {
-                if (table[i][j] != other.table[i][j]) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return table[row * length + col];
     }
 
     public byte getEmptyX() {
@@ -92,18 +79,30 @@ public class NPuzzle {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof NPuzzle)) {
+            return false;
+        }
+        NPuzzle other = (NPuzzle) o;
+        return this.length == other.length && Arrays.equals(this.table, other.table);
+    }
+
+    @Override
     public int hashCode() {
-        return Arrays.deepHashCode(table);
+        return Arrays.hashCode(table);
     }
 
     @Override
     public String toString() {
-        StringBuilder string = new StringBuilder();
-        for (byte[] line : table) {
-            string.append(Arrays.toString(line))
-                    .append("\n");
+        StringBuilder sb = new StringBuilder();
+        for (byte i = 0; i < length; i++) {
+            sb.append("[");
+            for (byte j = 0; j < length; j++) {
+                sb.append(getCell(i, j));
+                if (j < length - 1) sb.append(", ");
+            }
+            sb.append("]\n");
         }
-        string.deleteCharAt(string.length() - 1);
-        return string.toString();
+        return sb.toString().trim();
     }
 }
