@@ -2,7 +2,8 @@ package eth.epieffe.jwalker.algorithm;
 
 import eth.epieffe.jwalker.LocalSearch;
 import eth.epieffe.jwalker.nqueens.NQueens;
-import eth.epieffe.jwalker.nqueens.NQueensHeuristic;
+import eth.epieffe.jwalker.nqueens.NQueensGraph;
+import eth.epieffe.jwalker.nqueens.NQueensHeuristics;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -13,19 +14,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SteepestDescentTest {
 
     private final SteepestDescent<NQueens> search = new SteepestDescent<>(
-            NQueens.GRAPH,
+            NQueensGraph.INSTANCE,
             null,
-            NQueensHeuristic::numThreats,
+            NQueensHeuristics::numThreats,
             500);
 
     @ParameterizedTest
     @MethodSource("nQueens8Provider")
     public void test8QueensWithNThreatsHeuristic(NQueens start) {
         NQueens sol = search.run(start);
-        boolean isSolved = NQueens.GRAPH.isTarget(sol);
+        boolean isSolved = NQueensGraph.INSTANCE.isTarget(sol);
         // Retry up to 5 times
         for (int retry = 0; !isSolved && retry < 5; ++retry) {
-            isSolved = NQueens.GRAPH.isTarget(sol);
+            isSolved = NQueensGraph.INSTANCE.isTarget(sol);
         }
         assertTrue(isSolved);
     }
@@ -34,10 +35,10 @@ public class SteepestDescentTest {
     @MethodSource("nQueens50Provider")
     public void test50QueensWithNThreatsHeuristic(NQueens start) {
         NQueens sol = search.run(start);
-        boolean isSolved = NQueens.GRAPH.isTarget(sol);
+        boolean isSolved = NQueensGraph.INSTANCE.isTarget(sol);
         // Retry up to 10 times
         for (int retry = 0; !isSolved && retry < 10; ++retry) {
-            isSolved = NQueens.GRAPH.isTarget(sol);
+            isSolved = NQueensGraph.INSTANCE.isTarget(sol);
         }
         assertTrue(isSolved);
     }

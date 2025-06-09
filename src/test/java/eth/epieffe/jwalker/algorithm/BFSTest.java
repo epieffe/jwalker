@@ -3,8 +3,8 @@ package eth.epieffe.jwalker.algorithm;
 import eth.epieffe.jwalker.Edge;
 import eth.epieffe.jwalker.Graph;
 import eth.epieffe.jwalker.Visit;
-import eth.epieffe.jwalker.gridpathfinding.GridCell;
-import eth.epieffe.jwalker.gridpathfinding.GridPathFindingProblem;
+import eth.epieffe.jwalker.maze.Cell;
+import eth.epieffe.jwalker.maze.MazeGraph;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -17,11 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class BFSTest {
 
     public static class TestCase {
-        public final Graph<GridCell> graph;
-        public final GridCell startCell;
+        public final Graph<Cell> graph;
+        public final Cell startCell;
         public final double totalCost;
 
-        public TestCase(Graph<GridCell> graph, GridCell startCell, double totalCost) {
+        public TestCase(Graph<Cell> graph, Cell startCell, double totalCost) {
             this.graph = graph;
             this.startCell = startCell;
             this.totalCost = totalCost;
@@ -31,8 +31,8 @@ public class BFSTest {
     @ParameterizedTest
     @MethodSource("gridPathfindingProvider")
     public void testGridPathfinding(TestCase test) {
-        Visit<GridCell> visit = new BFS<>(test.graph);
-        List<Edge<GridCell>> path = visit.run(test.startCell);
+        Visit<Cell> visit = new BFS<>(test.graph);
+        List<Edge<Cell>> path = visit.run(test.startCell);
         assertValidPath(test.graph, test.startCell, path);
         assertEquals(test.totalCost, path.size());
     }
@@ -50,9 +50,9 @@ public class BFSTest {
                 {1, 1, 1, 0, 0, 0, 0, 0, 1, 1},
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
         };
-        GridPathFindingProblem problem1 = GridPathFindingProblem.newInstance(grid1, 9, 6);
-        GridCell start1 = GridCell.newInstance(problem1, 4, 2);
-        TestCase test1 = new TestCase(problem1, start1, 8);
+        MazeGraph graph1 = MazeGraph.newInstance(grid1, 9, 6);
+        Cell start1 = new Cell(4, 2);
+        TestCase test1 = new TestCase(graph1, start1, 8);
 
         return Stream.of(test1);
     }

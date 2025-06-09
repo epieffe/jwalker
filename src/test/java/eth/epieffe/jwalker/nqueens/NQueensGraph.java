@@ -6,8 +6,30 @@ import eth.epieffe.jwalker.Graph;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The {@link Graph} of {@link NQueens} instances.
+ */
 public class NQueensGraph implements Graph<NQueens> {
 
+    /**
+     * The singleton instance
+     */
+    public static final NQueensGraph INSTANCE = new NQueensGraph();
+
+    // No need to create more than one instance
+    private NQueensGraph() {}
+
+    /**
+     * Returns the edges that bring from the provided {@link NQueens} instance
+     * to its neighbours.<p>
+     *
+     * Each returned edge represents a move of one queen through its column in
+     * the current instance.
+     *
+     * @param node an instance of {@link NQueens}
+     * @return the edges that bring from node to its neighbours
+     * @throws NullPointerException if node is {@code null}
+     */
     @Override
     public List<Edge<NQueens>> outgoingEdges(NQueens node) {
         int length = node.size();
@@ -25,8 +47,7 @@ public class NQueensGraph implements Graph<NQueens> {
                         }
                     }
                     NQueens newConfig = new NQueens(newPosArray);
-                    String label = String.format("%d -> %d", i, newPosArray[i]);
-                    Edge<NQueens> edge = new Edge<>(label, 1, newConfig);
+                    Edge<NQueens> edge = new Edge<>(null, 1, newConfig);
                     edgeList.add(edge);
                 }
             }
@@ -35,7 +56,11 @@ public class NQueensGraph implements Graph<NQueens> {
     }
 
     /**
-     * Ritorna true se nessuna delle regine nella scacchiera è minacciata
+     * Returns {@code true} if none of the queens in the provided {@link NQueens}
+     * instance is threatened by another queen.
+     *
+     * @param node an instance of {@link NQueens}
+     * @return {@code true} if none of the queens in the provided instance is threatened
      */
     @Override
     public boolean isTarget(NQueens node) {

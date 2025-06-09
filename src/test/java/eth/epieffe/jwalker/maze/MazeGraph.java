@@ -1,24 +1,18 @@
-package eth.epieffe.jwalker.gridpathfinding;
+package eth.epieffe.jwalker.maze;
 
-import eth.epieffe.jwalker.Graph;
 import eth.epieffe.jwalker.Edge;
+import eth.epieffe.jwalker.Graph;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GridPathFindingProblem implements Graph<GridCell> {
+public class MazeGraph implements Graph<Cell> {
 
     private final byte[][] grid;
     private final int targetRow;
     private final int targetCol;
 
-    private GridPathFindingProblem(byte[][] grid, int targetRow, int targetCol) {
-        this.grid = grid;
-        this.targetRow = targetRow;
-        this.targetCol = targetCol;
-    }
-
-    public static GridPathFindingProblem newInstance(int[][] grid, int targetRow, int targetCol) {
+    public static MazeGraph newInstance(int[][] grid, int targetRow, int targetCol) {
         if (grid.length == 0) {
             throw new IllegalArgumentException("Empty grid");
         }
@@ -44,12 +38,18 @@ public class GridPathFindingProblem implements Graph<GridCell> {
                 newGrid[i][j] = (byte)(Math.max(cell, 0));
             }
         }
-        return new GridPathFindingProblem(newGrid, targetRow, targetCol);
+        return new MazeGraph(newGrid, targetRow, targetCol);
+    }
+
+    private MazeGraph(byte[][] grid, int targetRow, int targetCol) {
+        this.grid = grid;
+        this.targetRow = targetRow;
+        this.targetCol = targetCol;
     }
 
     @Override
-    public List<Edge<GridCell>> outgoingEdges(GridCell cell) {
-        List<Edge<GridCell>> edges = new ArrayList<>(8);
+    public List<Edge<Cell>> outgoingEdges(Cell cell) {
+        List<Edge<Cell>> edges = new ArrayList<>(8);
         int width = grid.length;
         int height = grid[0].length;
 
@@ -67,7 +67,7 @@ public class GridPathFindingProblem implements Graph<GridCell> {
             if (newRow >= 0 && newRow < width && newCol >= 0 && newCol < height) {
                 byte cost = grid[newRow][newCol];
                 if (cost > 0) {
-                    GridCell newCell = new GridCell(newRow, newCol);
+                    Cell newCell = new Cell(newRow, newCol);
                     edges.add(new Edge<>(moveNames[i], cost, newCell));
                 }
             }
@@ -78,47 +78,20 @@ public class GridPathFindingProblem implements Graph<GridCell> {
 
 
     @Override
-    public boolean isTarget(GridCell cell) {
+    public boolean isTarget(Cell cell) {
         return cell.row == this.targetRow &&
                 cell.col == this.targetCol;
     }
 
-    public String prettyString(GridCell cell) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("GridPathFindingProblem{\n");
-        sb.append("  currentPosition=(").append(cell.row).append(", ").append(cell.col).append("),\n");
-        sb.append("  targetPosition=(").append(targetRow).append(", ").append(targetCol).append("),\n");
-        sb.append("  gridSize=(").append(grid.length).append("x").append(grid[0].length).append(")\n");
-        sb.append("  Grid:\n");
-
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[i].length; j++) {
-                if (i == cell.row && j == cell.col) {
-                    sb.append("🌟 ");
-                } else if (i == targetRow && j == targetCol) {
-                    sb.append("🎯 ");
-                } else if (grid[i][j] == 0) {
-                    sb.append("⬛ ");
-                } else {
-                    sb.append("⬜ ");
-                }
-            }
-            sb.append("\n");
-        }
-
-        sb.append("}");
-        return sb.toString();
-    }
-
-    public int getCost(int row, int col) {
+    public int cell(int row, int col) {
         return grid[row][col];
     }
 
-    public int getGridWidth() {
+    public int width() {
         return this.grid[0].length;
     }
 
-    public int getGridHeight() {
+    public int height() {
         return this.grid.length;
     }
 }
