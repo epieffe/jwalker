@@ -28,6 +28,16 @@ import java.util.function.Consumer;
 
 import static eth.epieffe.jwalker.algorithm.Util.buildPath;
 
+/**
+ * A {@link Visit} that implements the <i>A*</i> algorithm.
+ *
+ * @param <N> the type of nodes in the graph traversed by this visit
+ *
+ * @see Visit
+ * @see Heuristic
+ * @see Graph
+ * @author Epifanio Ferrari
+ */
 public final class AStar<N> implements Visit<N> {
 
     private final Graph<N> graph;
@@ -36,10 +46,30 @@ public final class AStar<N> implements Visit<N> {
 
     private final double hMul;
 
+    /**
+     * Allocates an {@code AStar} object and initializes it with the
+     * provided {@link Graph} and {@link Heuristic}.
+     *
+     * @param graph a {@link Graph} instance
+     * @param heuristic a {@link Heuristic} instance
+     * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
+     */
     public AStar(Graph<N> graph, Heuristic<N> heuristic) {
         this(graph, heuristic, 1);
     }
 
+    /**
+     * Allocates an {@code AStar} object and initializes it with the
+     * provided {@link Graph}, {@link Heuristic} and a heuristic
+     * multiplier. The higher the heuristic multiplier is, the more
+     * greedy the algorithm behaves.
+     *
+     * @param graph a {@link Graph} instance
+     * @param heuristic a {@link Heuristic} instance
+     * @param hMul the heuristic multiplier
+     * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
+     * @throws IllegalArgumentException if hMul is less then 1
+     */
     public AStar(Graph<N> graph, Heuristic<N> heuristic, double hMul) {
         if (hMul < 1) {
             throw new IllegalArgumentException("Argument hMul must be >= 1");

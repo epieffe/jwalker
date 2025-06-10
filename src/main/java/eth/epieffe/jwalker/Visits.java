@@ -46,6 +46,7 @@ public final class Visits {
      * @param heuristic a heuristic for the nodes in graph
      * @return a visit that traverses the provided graph with the <i>A*</i> algorithm
      * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
+     * @param <N> the type of nodes in graph
      */
     public static <N> Visit<N> aStar(Graph<N> graph, Heuristic<N> heuristic) {
         return new AStar<>(graph, heuristic);
@@ -75,6 +76,7 @@ public final class Visits {
      * @return a visit that traverses the provided graph with the <i>A*</i> algorithm
      * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
      * @throws IllegalArgumentException if hMul is less then 1
+     * @param <N> the type of nodes in graph
      */
     public static <N> Visit<N> aStar(Graph<N> graph, Heuristic<N> heuristic, double hMul) {
         return new AStar<>(graph, heuristic, hMul);
@@ -88,12 +90,13 @@ public final class Visits {
      * estimate.<p>
      *
      * <i>Best-first Search</i> is generally very fast, but it does not offer any guarantee
-     * on the cost of the returned path.
+     * on the cost of the returned path
      *
      * @param graph a {@link Graph} instance
      * @param heuristic a heuristic for the nodes in graph
      * @return a visit that traverses the provided graph with the <i>Best-first Search</i> algorithm
      * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
+     * @param <N> the type of nodes in graph
      */
     public static <N> Visit<N> greedyBestFirst(Graph<N> graph, Heuristic<N> heuristic) {
         return new GreedyBestFirst<>(graph, heuristic);
@@ -112,6 +115,7 @@ public final class Visits {
      * @param graph a {@link Graph} instance
      * @return a visit that traverses the provided graph with the <i>BFS</i> algorithm
      * @throws NullPointerException if graph is {@code null}
+     * @param <N> the type of nodes in graph
      */
     public static <N> Visit<N> bfs(Graph<N> graph) {
         return new BFS<>(graph);
@@ -126,6 +130,7 @@ public final class Visits {
      * @param graph a {@link Graph} instance
      * @return a visit that traverses the provided graph with the <i>Dijkstra</i> algorithm
      * @throws NullPointerException if graph is {@code null}
+     * @param <N> the type of nodes in graph
      */
     public static <N> Visit<N> dijkstra(Graph<N> graph) {
         return new AStar<>(graph, c -> 0);

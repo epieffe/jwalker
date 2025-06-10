@@ -17,8 +17,8 @@ package eth.epieffe.jwalker.algorithm;
 
 import eth.epieffe.jwalker.Edge;
 import eth.epieffe.jwalker.Graph;
-import eth.epieffe.jwalker.LocalSearch;
 import eth.epieffe.jwalker.Heuristic;
+import eth.epieffe.jwalker.LocalSearch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +27,16 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+/**
+ * A {@link LocalSearch} that implements the <i>Steepest descent</i> algorithm.
+ *
+ * @param <N> the type of nodes in the graph traversed by this local search
+ *
+ * @see LocalSearch
+ * @see Heuristic
+ * @see Graph
+ * @author Epifanio Ferrari
+ */
 public final class SteepestDescent<N> implements LocalSearch<N> {
 
     private final Random random = new Random();
@@ -39,6 +49,15 @@ public final class SteepestDescent<N> implements LocalSearch<N> {
 
     private final int maxSides;
 
+    /**
+     * Allocates a {@code SteepestDescent} object.
+     *
+     * @param graph a {@link Graph} instance
+     * @param randomNodeSupplier a supplier that generates a random node
+     * @param heuristic a {@link Heuristic} instance
+     * @param maxSides maximum number of allowed side moves
+     * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
+     */
     public SteepestDescent(
             Graph<N> graph,
             Supplier<N> randomNodeSupplier,
@@ -60,10 +79,25 @@ public final class SteepestDescent<N> implements LocalSearch<N> {
         return run(start, onVisit);
     }
 
+    /**
+     * Run the local search starting from the provided node.
+     *
+     * @param node a node in the underlying graph
+     * @return a node that minimizes the heuristic
+     * @throws NullPointerException if node is {@code null}
+     */
     public N run(N node) {
         return run(node, null);
     }
 
+    /**
+     * Run the local search starting from the provided node.
+     *
+     * @param node a node in the underlying graph
+     * @param onVisit a callback that will be executed on each visited node
+     * @return a node that minimizes the heuristic
+     * @throws NullPointerException if node is {@code null}
+     */
     public N run(N node, Consumer<N> onVisit) {
         N sol = null;
         N localBest = node;

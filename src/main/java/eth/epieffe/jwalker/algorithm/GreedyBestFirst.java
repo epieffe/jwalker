@@ -28,12 +28,30 @@ import java.util.function.Consumer;
 
 import static eth.epieffe.jwalker.algorithm.Util.buildPath;
 
+/**
+ * A {@link Visit} that implements the <i>Best-first search</i> algorithm.
+ *
+ * @param <N> the type of nodes in the graph traversed by this visit
+ *
+ * @see Visit
+ * @see Heuristic
+ * @see Graph
+ * @author Epifanio Ferrari
+ */
 public final class GreedyBestFirst<N> implements Visit<N> {
 
     private final Graph<N> graph;
 
     private final Heuristic<N> heuristic;
 
+    /**
+     * Allocates a {@code GreedyBestFirst} object and initializes it with the
+     * provided {@link Graph} and {@link Heuristic}.
+     *
+     * @param graph a {@link Graph} instance
+     * @param heuristic a {@link Heuristic} instance
+     * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
+     */
     public GreedyBestFirst(Graph<N> graph, Heuristic<N> heuristic) {
         this.graph = Objects.requireNonNull(graph);
         this.heuristic = Objects.requireNonNull(heuristic);

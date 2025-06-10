@@ -18,7 +18,7 @@ package eth.epieffe.jwalker;
 import java.util.Objects;
 
 /**
- * An edge that connects a source node to a destination node in a {@link Graph}.<p>
+ * An edge that connects a source node to a destination node in a {@link Graph}.
  *
  * @param <T> the type of the destination node in this edge
  */

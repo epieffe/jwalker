@@ -50,6 +50,9 @@ public final class LocalSearches {
      * @param maxSides maximum number of times that selecting a node with the same
      *                 heuristic as the current node is allowed
      * @return a local search that traverses the provided graph with the <i>Steepest descent</i> algorithm
+     * @throws NullPointerException if graph is {@code null}, or heuristic is {@code null},
+     * or randomNodeSupplier is {@code null}
+     * @param <N> the type of nodes in graph
      */
     public static <N> LocalSearch<N> steepestDescent(
             Graph<N> graph,

@@ -15,8 +15,8 @@
  */
 package eth.epieffe.jwalker.algorithm;
 
-import eth.epieffe.jwalker.Graph;
 import eth.epieffe.jwalker.Edge;
+import eth.epieffe.jwalker.Graph;
 import eth.epieffe.jwalker.Visit;
 
 import java.util.ArrayDeque;
@@ -29,10 +29,26 @@ import java.util.function.Consumer;
 
 import static eth.epieffe.jwalker.algorithm.Util.buildPath;
 
+/**
+ * A {@link Visit} that implements the <i>BFS</i> algorithm.
+ *
+ * @param <N> the type of nodes in the graph traversed by this visit
+ *
+ * @see Visit
+ * @see Graph
+ * @author Epifanio Ferrari
+ */
 public final class BFS<N> implements Visit<N> {
 
     private final Graph<N> graph;
 
+    /**
+     * Allocates a {@code BFS} object and initializes it with the
+     * provided {@link Graph}.
+     *
+     * @param graph a {@link Graph} instance
+     * @throws NullPointerException if graph is {@code null}
+     */
     public BFS(Graph<N> graph) {
         this.graph = Objects.requireNonNull(graph);
     }
