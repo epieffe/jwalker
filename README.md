@@ -1,22 +1,62 @@
 # JWalker
-Strongly typed Java library that solves user defined problems with various graph search algorithms.
-
-As an example, it can solve *NPuzzle* ([Wikipedia](https://en.wikipedia.org/wiki/15_puzzle)) and *NQueens* ([Wikipedia](https://en.wikipedia.org/wiki/Eight_queens_puzzle)) out of the box.
+An extremely generic Java library for applying *A** and other built-in search algorithms to user-defined graphs.
 
 ## Overview
-To define your custom graph you must implement the [Problem](src/main/java/eth/epieffe/jwalker/Problem.java) interface. For example implementations see [NPuzzleProblem](src/main/java/eth/epieffe/jwalker/npuzzle/NPuzzleProblem.java) or [NQueensProblem](src/main/java/eth/epieffe/jwalker/nqueens/NQueensProblem.java) classes.
+- **Generic**: Suitable for literally any problem that can be solved with a search algorithm
+- **Customizable**: Define custom graphs and heuristics
+- **Efficient**: The built-in algorithms use an efficient Fibonacci heap, borrowed from [jheaps](https://github.com/d-michail/jheaps)
+- **Lightweight**: No external dependencies
 
-You also need to define a heuristic for that graph implementing the [Heuristic](src/main/java/eth/epieffe/jwalker/Heuristic.java) interface. For example implementations see [NPuzzleHeuristic](src/main/java/eth/epieffe/jwalker/npuzzle/NPuzzleHeuristic.java) or [NQueensHeuristic](src/main/java/eth/epieffe/jwalker/nqueens/NQueensHeuristic.java) classes.
+The [jwalker-examples](https://github.com/epieffe/jwalker-examples) repository contains example projects to demonstrate how easy it is to use JWalker to solve any search problem.
 
-Then you can try to find a solution for your graph using a built-in solver that can be instantiated using [Visits](src/main/java/eth/epieffe/jwalker/Visits.java) or [LocalSearches](src/main/java/eth/epieffe/jwalker/LocalSearches.java) classes.
+### 🤌 How to use
+Define your own custom graph by creating a class that implements the [Graph](src/main/java/eth/epieffe/jwalker/Graph.java) interface, along with a separate class for the nodes in your graph.
+
+Once you have a *Graph*, you are ready to use the *Dijkstra* or *Breadth-First Search* built-in algorithms to find an optimal path from a starting node to a target node.
+
+If you want to use an informed search algorithm such as *A** or *Best-First Search*, you need to provide a heuristic for your nodes by implementing the [Heuristic](src/main/java/eth/epieffe/jwalker/Heuristic.java) functional interface.
+
+### ⚡Quick example
+The following code snippet uses the built-in *A** algorithm to find an optimal solution for an instance of the [N-Puzzle problem](https://en.wikipedia.org/wiki/15_puzzle).
+
+The example classes are borrowed from the [jwalker-examples](https://github.com/epieffe/jwalker-examples) repository.
+
+```java
+import eth.epieffe.jwalker.Edge;
+import eth.epieffe.jwalker.Graph;
+import eth.epieffe.jwalker.Heuristic;
+import eth.epieffe.jwalker.Visit;
+import eth.epieffe.jwalker.Visits;
+
+// Define a starting 8-Puzzle configuration
+NPuzzle start = NPuzzle.newInstance(1, 3, 8, 4, 6, 7, 5, 2, 0);
+// The N-Puzzle Graph is a singleton
+Graph<NPuzzle> graph = NPuzzleGraph.INSTANCE;
+// Use the sum of the manhattan distances from each cell to its target position as heuristic
+Heuristic<NPuzzle> heuristic = NPuzzleHeuristics::manhattanSum;
+// Create a visit for N-Puzzle using A*
+Visit<NPuzzle> visit = Visits.aStar(graph, heuristic);
+// Find an optimal path from the starting configuration to the target configuration
+List<Edge<NPuzzle>> path = visit.run(start);
+```
+
+See the implementation of the example classes at [NPuzzle](https://github.com/epieffe/jwalker-examples/blob/main/npuzzle/src/main/java/eth/epieffe/jwalker/example/npuzzle/NPuzzle.java), [NPuzzleGraph](https://github.com/epieffe/jwalker-examples/blob/main/npuzzle/src/main/java/eth/epieffe/jwalker/example/npuzzle/NPuzzleGraph.java) and [NPuzzleHeuristics](https://github.com/epieffe/jwalker-examples/blob/main/npuzzle/src/main/java/eth/epieffe/jwalker/example/npuzzle/NPuzzleHeuristics.java).
+
+### 💾 Installation
+If you use Maven, add the following dependency in your `pom.xml` file.
+```xml
+<dependency>
+    <groupId>com.github.epieffe</groupId>
+    <artifactId>jwalker</artifactId>
+    <version>1.0.1</version>
+</dependency>
+```
 
 ## Built-in algorithms
-Here we describe the built-in search algorithms. Developers may add new algorithms by implementing the relative Java interface.
+Here we describe the built-in search algorithms. Users might also add new algorithms by implementing the corresponding Java interface.
 
-### Visits
-A Visit algorithm starts from an initial (user defined) graph status and explores the edge graph to find the shortest path possible that brings from the initial status to a correct solution. Some visits are guaranteed to find an optimal path, while others sacrifice optimality for efficiency.
-
-Implements the [Visit](src/main/java/eth/epieffe/jwalker/Visit.java) interface.
+### 🧠 Visits
+A [Visit](src/main/java/eth/epieffe/jwalker/Visit.java) traverses a graph to find a path from a provided node to a target node. Some visits are guaranteed to find a path with the lowest cost possible, while other visits sacrifice path optimality in exchange for efficiency.
 
 #### built-in visits:
 - A* ([Wikipedia](https://en.wikipedia.org/wiki/A*_search_algorithm))
@@ -24,60 +64,10 @@ Implements the [Visit](src/main/java/eth/epieffe/jwalker/Visit.java) interface.
 - BFS ([Wikipedia](https://en.wikipedia.org/wiki/Breadth-first_search))
 - Dijkstra ([Wikipedia](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm))
 
-### Local searches
-A Local search algorithm starts from an initial graph status (usually randomly picked) and iteratively apply edges in order to get close to a solution. Only the found solution is returned, while the path that brings from the initial status to the solution is not of interest when using these kind of algorithms.
+### 🔎 Local searches
+A [LocalSearch](src/main/java/eth/epieffe/jwalker/LocalSearch.java) starts from one or more randomly generated nodes and navigates the graph until a node deemed optimal is found or a time bound is elapsed. It is used to solve computationally hard optimization problems. Unlike visits, a local search does not return a path, but only one node is returned.
 
-**The correctness of the found solution is not guaranteed**. If the search does not find a correct solution it returns a status that is as much close as possible to correctness.
+The returned node is not guaranteed to be optimal, subsequent runs might find a better node.
 
-Implements the [LocalSearch](src/main/java/eth/epieffe/jwalker/LocalSearch.java) interface.
 #### built-in local searches:
 - Steepest Descent ([Wikipedia](https://en.wikipedia.org/wiki/Gradient_descent))
-
-## Quick demo
-The [Main](src/main/java/eth/epieffe/jwalker/example/Main.java) class can be used to quickly solve *NPuzzle* or *NQueens* problems.
-
-You can quickly build an executable jar file using [Maven](https://maven.apache.org/).
-```bash
-mvn clean package
-```
-
-Then you'll find your executable jar file at `target/jwalker.jar`.
-
-### NPuzzle demo
-The executable jar file can easily solve *NPuzzle* graph instances using the *Best First* visit.
-
-You need to pass an initial graph status to the executable jar file as a csv file path command line argument.
-
-Some example *NPuzzle* solvable statuses can be found in the `examples` folder.
-
-```bash
-java -jar target/jwalker.jar npuzzle examples/npuzzle1.csv
-```
-
-### NQueens demo
-The jar file can also solve *NQueens* graph instances using the *Steepest Descent* search.
-
-You need to pass the number of queens in the chess board as a command line argument.
-
-```bash
-java -jar target/jwalker.jar nqueens 8
-```
-
-## Import as dependency in your project
-Obviously you can add the `jwalker.jar` to the classpath. Then you can define your custom [Problem](src/main/java/eth/epieffe/jwalker/Problem.java) and [Heuristic](src/main/java/eth/epieffe/jwalker/Heuristic.java) and try to feed the built-in searches and visits with your custom graph.
-
-If you are using [Maven](https://maven.apache.org/) in your project you can easily add this library to the classpath as a Maven dependency.
-
-First install this library in your local Maven repository:
-```bash
-mvn clean install
-```
-
-Then you can add this dependency in your project's `pom.xml` file.
-```xml
-<dependency>
-    <groupId>com.github.epieffe</groupId>
-    <artifactId>jwalker</artifactId>
-    <version>1.0.0</version>
-</dependency>
-```
