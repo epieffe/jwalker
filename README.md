@@ -46,7 +46,7 @@ See the implementation of the example classes at [NPuzzle](https://github.com/ep
 If you use Maven, add the following dependency in your `pom.xml` file.
 ```xml
 <dependency>
-    <groupId>com.github.epieffe</groupId>
+    <groupId>io.github.epieffe</groupId>
     <artifactId>jwalker</artifactId>
     <version>1.0.1</version>
 </dependency>
