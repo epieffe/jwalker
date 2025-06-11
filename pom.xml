@@ -5,7 +5,7 @@
 
     <groupId>io.github.epieffe</groupId>
     <artifactId>jwalker</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
 
     <name>JWalker</name>
@@ -36,7 +36,7 @@
         <connection>scm:git:git@github.com:epieffe/jwalker.git</connection>
         <developerConnection>scm:git:git@github.com:epieffe/jwalker.git</developerConnection>
         <url>https://github.com/epieffe/jwalker</url>
-        <tag>HEAD</tag>
+        <tag>jwalker-1.0.1</tag>
     </scm>
 
     <properties>
