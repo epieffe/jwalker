@@ -1,4 +1,8 @@
 # JWalker
+[![Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![Java 8](https://img.shields.io/badge/Java-%3E=%208-blue.svg)](https://adoptium.net/temurin/releases/?os=any&arch=any&version=8)
+[![Deploy Status](https://img.shields.io/github/actions/workflow/status/epieffe/jwalker/maven-publish.yml?label=deploy)](https://github.com/epieffe/jwalker/actions/workflows/maven-publish.yml)
+
 An extremely generic Java library for applying *A** and other built-in search algorithms to user-defined graphs.
 
 ## Overview
@@ -12,14 +16,14 @@ The [jwalker-examples](https://github.com/epieffe/jwalker-examples) repository c
 ### 🤌 How to use
 Define your own custom graph by creating a class that implements the [Graph](src/main/java/eth/epieffe/jwalker/Graph.java) interface, along with a separate class for the nodes in your graph.
 
-Once you have a *Graph*, you are ready to use the *Dijkstra* or *Breadth-First Search* built-in algorithms to find an optimal path from a starting node to a target node.
+Once you have a graph, you are ready to use the *Dijkstra* or *Breadth-First Search* built-in algorithms to find an optimal path from a starting node to a target node.
 
 If you want to use an informed search algorithm such as *A** or *Best-First Search*, you need to provide a heuristic for your nodes by implementing the [Heuristic](src/main/java/eth/epieffe/jwalker/Heuristic.java) functional interface.
 
 ### ⚡Quick example
 The following code snippet uses the built-in *A** algorithm to find an optimal solution for an instance of the [N-Puzzle problem](https://en.wikipedia.org/wiki/15_puzzle).
 
-The example classes are borrowed from the [jwalker-examples](https://github.com/epieffe/jwalker-examples) repository.
+The example graph, node and heuristic classes are borrowed from the [jwalker-examples](https://github.com/epieffe/jwalker-examples) repository.
 
 ```java
 import eth.epieffe.jwalker.Edge;
@@ -28,28 +32,28 @@ import eth.epieffe.jwalker.Heuristic;
 import eth.epieffe.jwalker.Visit;
 import eth.epieffe.jwalker.Visits;
 
-// Define a starting 8-Puzzle configuration
-NPuzzle start = NPuzzle.newInstance(1, 3, 8, 4, 6, 7, 5, 2, 0);
-// The N-Puzzle Graph is a singleton
 Graph<NPuzzle> graph = NPuzzleGraph.INSTANCE;
-// Use the sum of the manhattan distances from each cell to its target position as heuristic
 Heuristic<NPuzzle> heuristic = NPuzzleHeuristics::manhattanSum;
-// Create a visit for N-Puzzle using A*
 Visit<NPuzzle> visit = Visits.aStar(graph, heuristic);
-// Find an optimal path from the starting configuration to the target configuration
-List<Edge<NPuzzle>> path = visit.run(start);
+NPuzzle node = NPuzzle.newInstance(1, 3, 8, 4, 6, 7, 5, 2, 0);
+List<Edge<NPuzzle>> path = visit.run(node);
 ```
 
 See the implementation of the example classes at [NPuzzle](https://github.com/epieffe/jwalker-examples/blob/main/npuzzle/src/main/java/eth/epieffe/jwalker/example/npuzzle/NPuzzle.java), [NPuzzleGraph](https://github.com/epieffe/jwalker-examples/blob/main/npuzzle/src/main/java/eth/epieffe/jwalker/example/npuzzle/NPuzzleGraph.java) and [NPuzzleHeuristics](https://github.com/epieffe/jwalker-examples/blob/main/npuzzle/src/main/java/eth/epieffe/jwalker/example/npuzzle/NPuzzleHeuristics.java).
 
 ### 💾 Installation
-If you use Maven, add the following dependency in your `pom.xml` file.
+If you use Maven, add the following dependency in your `pom.xml` file:
 ```xml
 <dependency>
     <groupId>io.github.epieffe</groupId>
     <artifactId>jwalker</artifactId>
     <version>1.0.1</version>
 </dependency>
+```
+
+If you use Gradle, add the following dependency in your `build.gradle` file:
+```groovy
+implementation 'io.github.epieffe:jwalker:1.0.1'
 ```
 
 ## Built-in algorithms
