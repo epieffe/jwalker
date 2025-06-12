@@ -10,7 +10,7 @@
 
     <name>JWalker</name>
     <description>
-        A Java library for applying A* and other built-in search algorithms to user defined graphs
+        An extremely generic Java library for applying A* and other built-in search algorithms to user-defined graphs.
     </description>
     <url>https://github.com/epieffe/jwalker</url>
 

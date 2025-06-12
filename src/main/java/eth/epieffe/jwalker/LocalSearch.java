@@ -18,8 +18,7 @@ package eth.epieffe.jwalker;
 import java.util.function.Consumer;
 
 /**
- * A local search algorithm that traverses a {@link Graph} to find a
- * target node.<p>
+ * A local search algorithm that traverses a {@link Graph} to find a target node.<p>
  *
  * A {@code LocalSearch} is used to solve a computationally hard optimization
  * problem. It starts from one or more randomly generated nodes and navigates the

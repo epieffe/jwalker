@@ -50,7 +50,7 @@ public interface Heuristic<N> {
      * Returns a rough estimate of the lowest path cost from a provided
      * node to a target node.<p>
      *
-     * Must never be less than zero.
+     * The returned value must never be less than zero.
      *
      * @param node a node in a {@link Graph}
      * @return the heuristic evaluation for the provided node

@@ -18,7 +18,7 @@ package eth.epieffe.jwalker;
 import java.util.List;
 
 /**
- * A graph that can be traversed by a search algorithm such as <i>A*</i> or
+ * A graph that can be traversed by search algorithms such as <i>A*</i> or
  * <i>Dijkstra</i>. Methods are provided to retrieve the outgoing edges of a
  * specified node, and to check if a specified node is a target.<p>
  *
