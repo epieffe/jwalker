@@ -30,6 +30,8 @@ public class IDAStar<N> implements Visit<N> {
         List<Edge<N>> path = new ArrayList<>();
         stack.add(node);
         while (bound < Double.MAX_VALUE) {
+            System.out.println("NEW BOUND: " + bound);
+            System.out.println("##################################");
             double t = search(stack, path, 0, bound);
             if (t == FOUND) return path;
             bound = t;

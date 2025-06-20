@@ -7,11 +7,16 @@ import eth.epieffe.jwalker.Visit;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.RecursiveTask;
 import java.util.function.Consumer;
 
 public class IDAStar2<N> implements Visit<N> {
 
-    private static final double FOUND = 0;
+    private static final double FOUND = Double.MIN_VALUE;
+
+    private final ForkJoinPool forkJoinPool = ForkJoinPool.commonPool();
 
     private final Graph<N> graph;
 
@@ -25,41 +30,73 @@ public class IDAStar2<N> implements Visit<N> {
     @Override
     public List<Edge<N>> run(N node, Consumer<N> onVisit) {
         double bound = heuristic.eval(node);
-        List<IDANode<N>> stack = new ArrayList<>();
-        while (bound < Double.MAX_VALUE) {
-            stack.clear();
-            stack.add(new IDANode<>(null, null, node, 0));
-            IDANode<N> t = search(stack, bound);
-            if (t.f == FOUND) {
-                return Util.buildPath(t);
-            };
-            bound = t.f;
+        IDANode<N> idaNode = new IDANode<>(null, null, node, bound);
+        IDANode<N> result;
+        while (true) {
+            System.out.println("##################################");
+            System.out.println("NEW BOUND IDA2: " + bound);
+            System.out.println("##################################");
+            RecursiveTask<IDANode<N>> task = new RecursiveSearchTask(idaNode, 0, bound);
+            result = forkJoinPool.invoke(task);
+            if (result == null) return null;
+            if (result.f == FOUND) return Util.buildPath(result);
+            bound = result.f;
         }
-        // No solution found
-        return null;
     }
 
-    private IDANode<N> search(List<IDANode<N>> stack, double bound) {
-        IDANode<N> min = null;
-        while (!stack.isEmpty()) {
-            IDANode<N> current = stack.remove(stack.size() - 1);
-            current.f = current.g + heuristic.eval(current.value);
-            if (current.f <= bound) {
-                if (graph.isTarget(current.value)) {
-                    current.f = FOUND;
-                    return current;
-                }
-                for (Edge<N> edge : graph.outgoingEdges(current.value)) {
-                    if (!contains(stack, edge.destination)) {
-                        double g = current.g + edge.weight;
-                        stack.add(new IDANode<>(current, edge, edge.destination, g));
+    private class RecursiveSearchTask extends RecursiveTask<IDANode<N>> {
+
+        private final IDANode<N> node;
+        private final double g;
+        private final double bound;
+
+        public RecursiveSearchTask(IDANode<N> node, double g, double bound) {
+            this.node = node;
+            this.g = g;
+            this.bound = bound;
+        }
+
+        @Override
+        protected IDANode<N> compute() {
+            IDANode<N> min = null;
+            List<ForkJoinTask<IDANode<N>>> tasks = new ArrayList<>();
+            for (Edge<N> edge : graph.outgoingEdges(node.value)) {
+                if (!hasInPath(node, edge.destination)) {
+                    double nextG = g + edge.weight;
+                    double nextF = nextG + heuristic.eval(edge.destination);
+                    IDANode<N> next = new IDANode<>(node, edge, edge.destination, nextF);
+                    if (nextF > bound) {
+                        if (min == null || nextF < min.f) {
+                            min = next;
+                        }
+                    } else {
+                        if (graph.isTarget(next.value)) {
+                            next.f = FOUND;
+                            return next;
+                        }
+                        RecursiveTask<IDANode<N>> task = new RecursiveSearchTask(next, nextG, bound);
+                        tasks.add(task.fork());
                     }
                 }
-            } else if (min == null || current.f < min.f) {
-                min = current;
             }
+            for (ForkJoinTask<IDANode<N>> task : tasks) {
+                IDANode<N> result = task.join();
+                if (result != null && (min == null || result.f < min.f)) {
+                    min = result;
+                }
+            }
+            return min;
         }
-        return min;
+
+        private boolean hasInPath(IDANode<N> node, N value) {
+            while (node != null) {
+                if (value.equals(node.value)) {
+                    return true;
+                }
+                node = (IDANode<N>) node.parent;
+            }
+            return false;
+        }
     }
 
     @Override
@@ -67,32 +104,14 @@ public class IDAStar2<N> implements Visit<N> {
         return graph;
     }
 
-    private static <T> boolean contains(List<IDANode<T>> stack, Object node) {
-        for (IDANode<T> n : stack) {
-            if (node.equals(n.value)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static <T> List<Edge<T>> buildPath(List<IDANode<T>> stack) {
-        List<Edge<T>> path = new ArrayList<>();
-        for (int i = stack.size() - 1; i > 0; --i) {
-            path.add(stack.get(i).edge);
-        }
-        return path;
-    }
-
     private static class IDANode<T> extends Node<T> {
         final T value;
-        final double g;
         double f;
 
-        public IDANode(IDANode<T> parent, Edge<T> edge, T value, double g) {
+        public IDANode(IDANode<T> parent, Edge<T> edge, T value, double f) {
             super(parent, edge);
             this.value = value;
-            this.g = g;
+            this.f = f;
         }
     }
 }

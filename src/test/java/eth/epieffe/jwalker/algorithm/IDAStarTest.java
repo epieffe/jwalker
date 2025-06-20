@@ -18,7 +18,7 @@ public class IDAStarTest {
     @Test
     public void test8Puzzle() {
         Graph<NPuzzle> graph = NPuzzleGraph.INSTANCE;
-        Visit<NPuzzle> visit = new IDAStar<>(graph, NPuzzleHeuristics::manhattanSum);
+        Visit<NPuzzle> visit = new IDAStar3<>(graph, NPuzzleHeuristics::manhattanSum);
         //NPuzzle start = NPuzzle.newInstance(8, 7, 4, 1, 6, 3, 2, 5, 0);
         NPuzzle start = NPuzzle.newInstance(8, 12, 10,  7, 3, 14,  6, 13, 4,  9,  5,  2, 1, 15, 11,  0);
         long time = System.currentTimeMillis();
