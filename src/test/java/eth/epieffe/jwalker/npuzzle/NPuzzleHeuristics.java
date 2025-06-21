@@ -33,20 +33,14 @@ public class NPuzzleHeuristics {
      */
     public static int manhattanSum(NPuzzle nPuzzle) {
         int sum = 0;
-        for (byte row = 0; row < nPuzzle.size; row++) {
-            for (byte col = 0; col < nPuzzle.size; col++) {
+        for (int row = 0; row < nPuzzle.size; row++) {
+            for (int col = 0; col < nPuzzle.size; col++) {
                 int cell = nPuzzle.cell(row, col);
-                if (cell == NPuzzle.EMPTY_CELL) {
-                    cell = nPuzzle.size * nPuzzle.size;
+                if (cell != NPuzzle.EMPTY_CELL) {
+                    int targetCol = (cell - 1) % nPuzzle.size;
+                    int targetRow = (cell - 1) / nPuzzle.size;
+                    sum += Math.abs(col - targetCol) + Math.abs(row - targetRow);
                 }
-                int targetCol = cell;
-                int targetRow = 0;
-                while (targetCol > nPuzzle.size) {
-                    targetCol -= nPuzzle.size;
-                    targetRow++;
-                }
-                targetCol--;
-                sum += Math.abs(col - targetCol) + Math.abs(row - targetRow);
             }
         }
         return sum;

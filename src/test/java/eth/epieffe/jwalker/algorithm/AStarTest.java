@@ -67,6 +67,6 @@ public class AStarTest {
         NPuzzle start = NPuzzle.newInstance(8, 12, 10,  7, 3, 14,  6, 13, 4,  9,  5,  2, 1, 15, 11,  0);
         List<Edge<NPuzzle>> path = visit.run(start);
         assertValidPath(graph, start, path);
-        assertEquals(78, path.size());
+        assertEquals(74, path.size());
     }
 }
