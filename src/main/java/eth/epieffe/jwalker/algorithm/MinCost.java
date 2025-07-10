@@ -30,7 +30,12 @@ import java.util.function.Predicate;
 import static eth.epieffe.jwalker.algorithm.Util.buildPath;
 
 /**
- * A {@link Visit} that implements the <i>A*</i> algorithm.
+ * A {@link Visit} that implements A* or Dijkstra, depending on the parameters
+ * provided in the constructor.
+ * <p>
+ * If no {@link Heuristic} is provided, the behavior is equivalent to Dijkstra's
+ * algorithm, while if a non-trivial heuristic function is provided, the behavior
+ * corresponds to A* search.
  *
  * @param <N> the type of nodes in the graph traversed by this visit
  *
@@ -39,7 +44,7 @@ import static eth.epieffe.jwalker.algorithm.Util.buildPath;
  * @see Graph
  * @author Epifanio Ferrari
  */
-public final class AStar<N> implements Visit<N> {
+public final class MinCost<N> implements Visit<N> {
 
     private final Graph<N> graph;
 
@@ -50,58 +55,66 @@ public final class AStar<N> implements Visit<N> {
     private final double hMul;
 
     /**
-     * Allocates an {@code AStar} object and initializes it with the provided
-     * {@link Graph} and {@link Heuristic}. Any node for which the provided
-     * heuristic evaluates to zero is considered a target node.
+     * Constructs a {@code MinCost} instance with the behaviour of the A* algorithm.
+     * <p>
+     * Nodes for which the provided {@link Heuristic} evaluates to zero are
+     * considered target nodes.
      *
      * @param graph a {@link Graph} instance
      * @param heuristic a {@link Heuristic} instance
-     * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
+     * @throws NullPointerException if {@code graph} or {@code heuristic} is {@code null}
      */
-    public AStar(Graph<N> graph, Heuristic<N> heuristic) {
+    public MinCost(Graph<N> graph, Heuristic<N> heuristic) {
         this(graph, heuristic, 1);
     }
 
     /**
-     * Allocates an {@code AStar} object and initializes it with the
-     * provided {@link Graph}, {@link Heuristic} and a heuristic
-     * multiplier. The higher the heuristic multiplier is, the more
-     * greedy the algorithm behaves. Any node for which the provided
-     * heuristic evaluates to zero is considered a target node.
+     * Constructs a {@code MinCost} instance with the behaviour of the A* algorithm.
+     * <p>
+     * The heuristic value is multiplied by {@code hMul}. The higher the value
+     * of {@code hMul}, the more greedy the search becomes.
+     * <p>
+     * Nodes for which the provided {@link Heuristic} evaluates to zero are
+     * considered target nodes.
      *
      * @param graph a {@link Graph} instance
      * @param heuristic a {@link Heuristic} instance
      * @param hMul the heuristic multiplier
-     * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
+     * @throws NullPointerException if {@code graph} or {@code heuristic} is {@code null}
      */
-    public AStar(Graph<N> graph, Heuristic<N> heuristic, int hMul) {
+    public MinCost(Graph<N> graph, Heuristic<N> heuristic, int hMul) {
         this(graph, heuristic, null, hMul);
     }
 
     /**
-     * Allocates an {@code AStar} object and initializes it with the
-     * provided {@link Graph} and a {@code Predicate} to determine if a provided
-     * node is a target node.
+     * Constructs a {@code MinCost} instance with the behaviour of the Dijkstra's algorithm.
+     * <p>
+     * Nodes satisfying the {@code targetPredicate} are considered target nodes.
      *
      * @param graph a {@link Graph} instance
-     * @param targetPredicate a predicate that determines if a provided node is a target node
-     * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
+     * @param targetPredicate a predicate that identifies the target nodes
+     * @throws NullPointerException if {@code graph} or {@code targetPredicate} is {@code null}
      */
-    public AStar(Graph<N> graph, Predicate<N> targetPredicate) {
+    public MinCost(Graph<N> graph, Predicate<N> targetPredicate) {
         this(graph, n -> 0, Objects.requireNonNull(targetPredicate), 1);
     }
 
     /**
-     * Allocates an {@code AStar} object.
+     * Constructs a {@code MinCost} instance with fully customizable parameters.
+     * <p>
+     * If {@code targetPredicate} is not {@code null}, it is used to identify target nodes.
+     * Otherwise, nodes for which the provided {@link Heuristic} evaluates to zero are
+     * considered target nodes. The heuristic value is multiplied by {@code hMul}; higher
+     * values of {@code hMul} make the search more greedy.
      *
      * @param graph a {@link Graph} instance
-     * @param heuristic a {@link Heuristic} instance
-     * @param targetPredicate a predicate that determines if a given node is a target node
+     * @param heuristic a {@link Heuristic} function to estimate the cost to the target
+     * @param targetPredicate a predicate that identifies target nodes, or {@code null}
      * @param hMul the heuristic multiplier
-     * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
-     * @throws IllegalArgumentException if hMul is less then 1
+     * @throws NullPointerException if {@code graph} or {@code heuristic} are {@code null}
+     * @throws IllegalArgumentException if {@code hMul} is less than 1
      */
-    public AStar(Graph<N> graph, Heuristic<N> heuristic, Predicate<N> targetPredicate, double hMul) {
+    public MinCost(Graph<N> graph, Heuristic<N> heuristic, Predicate<N> targetPredicate, double hMul) {
         if (hMul < 1) {
             throw new IllegalArgumentException("Argument hMul must be >= 1");
         }

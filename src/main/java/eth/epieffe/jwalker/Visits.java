@@ -15,7 +15,7 @@
  */
 package eth.epieffe.jwalker;
 
-import eth.epieffe.jwalker.algorithm.AStar;
+import eth.epieffe.jwalker.algorithm.MinCost;
 import eth.epieffe.jwalker.algorithm.BFS;
 import eth.epieffe.jwalker.algorithm.GreedyBestFirst;
 import eth.epieffe.jwalker.algorithm.IDAStar;
@@ -52,7 +52,7 @@ public final class Visits {
      * @param <N> the type of nodes in the graph
      */
     public static <N> Visit<N> aStar(Graph<N> graph, Heuristic<N> heuristic) {
-        return new AStar<>(graph, heuristic);
+        return new MinCost<>(graph, heuristic);
     }
 
     /**
@@ -76,7 +76,7 @@ public final class Visits {
      * @param <N> the type of nodes in the graph
      */
     public static <N> Visit<N> aStar(Graph<N> graph, Heuristic<N> heuristic, double hMul) {
-        return new AStar<>(graph, heuristic, null, hMul);
+        return new MinCost<>(graph, heuristic, null, hMul);
     }
 
     /**
@@ -190,7 +190,7 @@ public final class Visits {
      * @param <N> the type of nodes in the graph
      */
     public static <N> Visit<N> dijkstra(Graph<N> graph, N target) {
-        return new AStar<>(graph, target::equals);
+        return new MinCost<>(graph, target::equals);
     }
 
     /**
@@ -207,7 +207,7 @@ public final class Visits {
      * @param <N> the type of nodes in the graph
      */
     public static <N> Visit<N> dijkstra(Graph<N> graph, Predicate<N> targetPredicate) {
-        return new AStar<>(graph, targetPredicate);
+        return new MinCost<>(graph, targetPredicate);
     }
 
     /**
