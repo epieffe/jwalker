@@ -69,26 +69,4 @@ public class NQueensGraph implements Graph<NQueens> {
         }
         return edgeList;
     }
-
-    /**
-     * Returns {@code true} if none of the queens in the provided {@link NQueens}
-     * instance is threatened by another queen.
-     *
-     * @param node an instance of {@link NQueens}
-     * @return {@code true} if none of the queens in the provided instance is threatened
-     */
-    @Override
-    public boolean isTarget(NQueens node) {
-        for (int col = 0; col < node.size(); col++) {
-            int colVal = node.row(col);
-            for (int i = col + 1; i < node.size(); i++) {
-                int val = node.row(i);
-                int dist = i - col;
-                if (val == colVal || val == colVal - dist || val == colVal + dist) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
 }

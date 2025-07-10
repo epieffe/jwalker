@@ -22,7 +22,9 @@ import eth.epieffe.jwalker.Visit;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * A {@link Visit} that implements the <i>IDA*</i> algorithm.
@@ -42,11 +44,21 @@ public class IDAStar<N> implements Visit<N> {
 
     private final Heuristic<N> heuristic;
 
+    private final Predicate<N> targetPredicate;
+
     public IDAStar(Graph<N> graph, Heuristic<N> heuristic) {
-        this.graph = graph;
-        this.heuristic = heuristic;
+        this(graph, heuristic, null);
     }
 
+    public IDAStar(Graph<N> graph, Predicate<N> targetPredicate) {
+        this(graph, n -> 0, Objects.requireNonNull(targetPredicate));
+    }
+
+    public IDAStar(Graph<N> graph, Heuristic<N> heuristic, Predicate<N> targetPredicate) {
+        this.graph = Objects.requireNonNull(graph);
+        this.heuristic = Objects.requireNonNull(heuristic);
+        this.targetPredicate = targetPredicate;
+    }
 
     @Override
     public List<Edge<N>> run(N node, Consumer<N> onVisit) {
@@ -58,12 +70,13 @@ public class IDAStar<N> implements Visit<N> {
             stack.add(new IDANode<>(null, null, node, 0));
             while (!stack.isEmpty()) {
                 IDANode<N> current = stack.remove(stack.size() - 1);
-                double f = current.g + heuristic.eval(current.value);
+                double h = heuristic.eval(current.value);
+                double f = current.g + h;
                 if (f <= bound) {
                     if (onVisit != null) {
                         onVisit.accept(current.value);
                     }
-                    if (graph.isTarget(current.value)) {
+                    if (targetPredicate == null ? h == 0 : targetPredicate.test(current.value)) {
                         return Util.buildPath(current);
                     }
                     for (Edge<N> edge : graph.outgoingEdges(current.value)) {

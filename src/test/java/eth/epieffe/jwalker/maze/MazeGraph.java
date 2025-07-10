@@ -91,13 +91,6 @@ public class MazeGraph implements Graph<Cell> {
         return edges;
     }
 
-
-    @Override
-    public boolean isTarget(Cell cell) {
-        return cell.row == this.targetRow &&
-                cell.col == this.targetCol;
-    }
-
     public int cell(int row, int col) {
         return grid[row][col];
     }

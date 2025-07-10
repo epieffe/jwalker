@@ -78,6 +78,25 @@ public class NPuzzle {
     }
 
     /**
+     * Returns true if this N-Puzzle instance is a solution.
+     *
+     * @return true if this N-Puzzle instance is a solution
+     */
+    public boolean isSolved() {
+        // The last cell must be empty
+        if (table[table.length - 1] > 0) {
+            return false;
+        }
+        // The other cells must be ordered from 1 to n-1
+        for (int i = 1; i < table.length; ++i) {
+            if (table[i - 1] != i) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Returns the size of this instance.
      *
      * @return the size of this instance

@@ -31,6 +31,7 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static eth.epieffe.jwalker.algorithm.IDAStar.IDANode;
 
@@ -46,14 +47,25 @@ public class ParallelIDAStar<N> implements Visit<N> {
 
     private final Heuristic<N> heuristic;
 
+    private final Predicate<N> targetPredicate;
+
     private final int nThreads;
 
     public ParallelIDAStar(Graph<N> graph, Heuristic<N> heuristic, int nThreads) {
+        this(graph, heuristic, null, nThreads);
+    }
+
+    public ParallelIDAStar(Graph<N> graph, Predicate<N> targetPredicate, int nThreads) {
+        this(graph, n -> 0, Objects.requireNonNull(targetPredicate), nThreads);
+    }
+
+    public ParallelIDAStar(Graph<N> graph, Heuristic<N> heuristic, Predicate<N> targetPredicate, int nThreads) {
         if (nThreads <= 0) {
             throw new IllegalArgumentException("Argument nThreads must be greater than zero");
         }
         this.graph = Objects.requireNonNull(graph);
         this.heuristic = Objects.requireNonNull(heuristic);
+        this.targetPredicate = targetPredicate;
         this.nThreads = nThreads;
     }
 
@@ -185,12 +197,13 @@ public class ParallelIDAStar<N> implements Visit<N> {
                     }
                 }
 
-                double f = current.g + heuristic.eval(current.value);
+                double h = heuristic.eval(current.value);
+                double f = current.g + h;
                 if (f <= bound) {
                     if (onVisit != null) {
                         onVisit.accept(current.value);
                     }
-                    if (graph.isTarget(current.value)) {
+                    if (targetPredicate == null ? h == 0 : targetPredicate.test(current.value)) {
                         solution = current;
                         return;
                     }

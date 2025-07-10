@@ -21,8 +21,13 @@ import eth.epieffe.jwalker.algorithm.GreedyBestFirst;
 import eth.epieffe.jwalker.algorithm.IDAStar;
 import eth.epieffe.jwalker.algorithm.ParallelIDAStar;
 
+import java.util.function.Predicate;
+
 /**
  * Factory methods for {@link Visit} classes.
+ * <p>
+ * This class offers static methods to instantiate different pathfinding algorithms,
+ * such as A*, Best-First Search, IDA*, BFS, Dijkstra, and their parallel variant.
  *
  * @see Visit
  * @see Graph
@@ -33,202 +38,257 @@ public final class Visits {
     private Visits() {}
 
     /**
-     * Creates a {@link Visit} that implements the <i>A*</i> algorithm.<p>
+     * Creates a {@link Visit} that implements the <i>A*</i> algorithm.
+     * <p>
+     * A* uses a {@link Heuristic} to guide the search. If the provided heuristic is
+     * consistent, A* is guaranteed to find a path with the lowest cost possible.
+     * <p>
+     * Nodes for which the heuristic evaluates to zero are considered target nodes.
      *
-     * <i>A*</i> uses a {@link Heuristic} to determine which node to explore during
-     * each iteration. Specifically, it selects the node {@code n} that minimizes
-     * {@code g + h}, where {@code g} is the cost of the path from the start node
-     * to {@code n}, and {@code h} is the heuristic estimate for {@code n}.<p>
-     *
-     * When <i>A*</i> uses a consistent heuristic, it is guaranteed to always return
-     * a path with the lowest cost possible. The cost of a path is the sum of the
-     * weights of its constituent edges.
-     *
-     * @param graph a {@link Graph} instance
-     * @param heuristic a heuristic for the nodes in graph
-     * @return a visit that traverses the provided graph with the <i>A*</i> algorithm
-     * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
-     * @param <N> the type of nodes in graph
+     * @param graph a {@link Graph} instance to traverse
+     * @param heuristic a heuristic for the nodes in the graph
+     * @return a visit that traverses the provided graph using the A* algorithm
+     * @throws NullPointerException if {@code graph} or {@code heuristic} is {@code null}
+     * @param <N> the type of nodes in the graph
      */
     public static <N> Visit<N> aStar(Graph<N> graph, Heuristic<N> heuristic) {
         return new AStar<>(graph, heuristic);
     }
 
     /**
-     * Creates a {@link Visit} that implements a variation of the <i>A*</i> algorithm that
-     * can be configured to be more greedy and less optimal.<p>
+     * Creates a {@link Visit} that implements a variation of the <i>A*</i> algorithm
+     * which can be configured to be more greedy and less optimal using a heuristic multiplier.
+     * <p>
+     * The heuristic value is multiplied by {@code hMul} to influence the search behavior. The
+     * higher the value of {@code hMul}, the more greedy the search becomes. If the provided
+     * {@link Heuristic} is consistent, this visit is guaranteed to find a path with a total cost
+     * less than or equal to {@code min * hMul}, where {@code min} is the lowest cost possible
+     * for a valid path.
+     * <p>
+     * Nodes for which the heuristic evaluates to zero are considered target nodes.
      *
-     * This algorithm uses a {@link Heuristic} to determine which node to explore
-     * during each iteration. Specifically, it selects the node {@code n} that minimizes
-     * {@code g + (h * hMul)}, where {@code g} is the cost of the path from the start node
-     * to {@code n}, and {@code h} is the heuristic estimate for {@code n}.<p>
-     *
-     * The higher {@code hMul} is, the more greedy this algorithm becomes. When {@code hMul}
-     * is equal to 1,  this algorithm behaves exactly like the standard <i>A*</i>.
-     * {@code hMul} cannot be lower than 1.<p>
-     *
-     * When this algorithm uses a consistent heuristic, it is guaranteed to always return
-     * a path with a cost less than or equal {@code min * hMul}, where {@code min} is the
-     * lowest cost possible for a valid path. The cost of a path is the sum of the
-     * weights of its constituent edges.
-     *
-     * @param graph a {@link Graph} instance
-     * @param heuristic a heuristic for the nodes in graph
-     * @param hMul the heuristic multiplier
-     * @return a visit that traverses the provided graph with the <i>A*</i> algorithm
-     * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
-     * @throws IllegalArgumentException if hMul is less then 1
-     * @param <N> the type of nodes in graph
+     * @param graph a {@link Graph} instance to traverse
+     * @param heuristic a heuristic for the nodes in the graph
+     * @param hMul multiplier for the heuristic value
+     * @return a visit that traverses the provided graph using the A* algorithm
+     * @throws NullPointerException if {@code graph} or {@code heuristic} is {@code null}
+     * @throws IllegalArgumentException if {@code hMul} is less than 1
+     * @param <N> the type of nodes in the graph
      */
     public static <N> Visit<N> aStar(Graph<N> graph, Heuristic<N> heuristic, double hMul) {
-        return new AStar<>(graph, heuristic, hMul);
+        return new AStar<>(graph, heuristic, null, hMul);
     }
 
     /**
-     * Creates a {@link Visit} that implements the <i>Best-first Search</i> algorithm.<p>
+     * Creates a {@link Visit} that implements the <i>Best-First Search</i> algorithm.
+     * <p>
+     * Best-First Search is similar to A*, but it always expands the node that appears to
+     * be closest to the goal according to the provided {@link Heuristic}. This approach
+     * is generally faster than A* but does not guarantee finding the shortest path.
+     * <p>
+     * Nodes for which the heuristic evaluates to zero are considered target nodes.
      *
-     * <i>Best-first Search</i> uses a {@link Heuristic} to determine which node to explore
-     * during each iteration. Specifically, it selects the node with the lowest heuristic
-     * estimate.<p>
-     *
-     * <i>Best-first Search</i> is generally very fast, but it does not offer any guarantee
-     * on the cost of the returned path
-     *
-     * @param graph a {@link Graph} instance
-     * @param heuristic a heuristic for the nodes in graph
-     * @return a visit that traverses the provided graph with the <i>Best-first Search</i> algorithm
-     * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
-     * @param <N> the type of nodes in graph
+     * @param graph a {@link Graph} instance to traverse
+     * @param heuristic a heuristic for the nodes in the graph
+     * @return a visit that traverses the provided graph using the Best-First Search algorithm
+     * @throws NullPointerException if {@code graph} or {@code heuristic} is {@code null}
+     * @param <N> the type of nodes in the graph
      */
-    public static <N> Visit<N> greedyBestFirst(Graph<N> graph, Heuristic<N> heuristic) {
+    public static <N> Visit<N> bestFirst(Graph<N> graph, Heuristic<N> heuristic) {
         return new GreedyBestFirst<>(graph, heuristic);
     }
 
     /**
-     * Creates a {@link Visit} that implements the <i>IDA*</i> algorithm.<p>
+     * Creates a {@link Visit} that implements the <i>Iterative Deepening A*</i> (IDA*) algorithm.
+     * <p>
+     * IDA* combines the space efficiency of depth-first search with the optimality of A*. It
+     * repeatedly performs depth-limited searches, increasing the cost threshold at each iteration
+     * based on the provided {@link Heuristic} until a solution is found. If the heuristic is
+     * consistent, IDA* is guaranteed to find a path with the lowest possible cost.
+     * <p>
+     * Nodes for which the heuristic evaluates to zero are considered target nodes.
      *
-     * <i>IDA*</i> repeatedly runs a depth-first search, cutting off a branch when its
-     * total cost exceeds a given threshold. The given threshold is increased at each
-     * iteration, until a goal is found.<p>
-     *
-     * While the standard iterative deepening depth-first search uses search depth as
-     * the cutoff for each iteration, <i>IDA*</i> uses {@code g + h}, where {@code g}
-     * is the cost of travelling from the root node to the current node {@code n}, and
-     * {@code h} is the heuristic estimate for {@code n}.<p>
-     *
-     * Compared to <i>A*</i>, <i>IDA*</i> uses much less memory, but often ends up exploring
-     * the same nodes many times.<p>
-     *
-     * When <i>IDA*</i> uses a consistent heuristic, it is guaranteed to always return
-     * a path with the lowest cost possible. The cost of a path is the sum of the
-     * weights of its constituent edges.
-     *
-     * @param graph a {@link Graph} instance
-     * @param heuristic a heuristic for the nodes in graph
-     * @return a visit that traverses the provided graph with the <i>IDA*</i> algorithm
-     * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
-     * @param <N> the type of nodes in graph
+     * @param graph a {@link Graph} instance to traverse
+     * @param heuristic a heuristic for the nodes in the graph
+     * @return a visit that traverses the provided graph using the IDA* algorithm
+     * @throws NullPointerException if {@code graph} or {@code heuristic} is {@code null}
+     * @param <N> the type of nodes in the graph
      */
     public static <N> Visit<N> idaStar(Graph<N> graph, Heuristic<N> heuristic) {
         return new IDAStar<>(graph, heuristic);
     }
 
     /**
-     * Creates a {@link Visit} that implements a parallel version of the <i>IDA*</i> algorithm.<p>
+     * Creates a {@link Visit} that implements a parallel version of the <i>Iterative Deepening A*</i> (IDA*) algorithm.
+     * <p>
+     * This algorithm repeatedly performs depth-limited searches, increasing the cost threshold
+     * at each iteration based on the provided {@link Heuristic} until a solution is found. If
+     * the heuristic is consistent, it is guaranteed to find a path with the lowest possible cost.
+     * The work for each cost-bounded search iteration is distributed among multiple threads.
      *
-     * The work done in each cost-bounded search iteration is shared among a number of threads.
-     * When a thread has finished its work, it tries to steal some work from the other threads.
-     * When all the work in the current iteration is done, the threads detect termination and a
-     * new iteration is started, until a solution is found.
-     *
-     * @see Visits#idaStar(Graph, Heuristic)
-     *
-     * @param graph a {@link Graph} instance
-     * @param heuristic a heuristic for the nodes in graph
-     * @param nThreads number of threads to use
-     * @return a visit that traverses the provided graph with the parallel <i>IDA*</i> algorithm
-     * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
-     * @throws IllegalArgumentException if nThreads is less then or equal to zero
-     * @param <N> the type of nodes in graph
+     * @param graph a {@link Graph} instance to traverse
+     * @param heuristic a heuristic for the nodes in the graph
+     * @param nThreads the number of threads to use for parallel search
+     * @return a visit that traverses the provided graph using the parallel IDA* algorithm
+     * @throws NullPointerException if {@code graph} or {@code heuristic} is {@code null}
+     * @throws IllegalArgumentException if {@code nThreads} is less than or equal to zero
+     * @param <N> the type of nodes in the graph
      */
-    public static <N> Visit<N> parallelIDAStar(Graph<N> graph, Heuristic<N> heuristic, int nThreads) {
+    public static <N> Visit<N> idaStarParallel(Graph<N> graph, Heuristic<N> heuristic, int nThreads) {
         return new ParallelIDAStar<>(graph, heuristic, nThreads);
     }
 
     /**
-     * Creates a {@link Visit} that implements the <i>Breadth-first search</i> algorithm,
-     * also known as <i>BFS</i>.<p>
-     *
-     * <i>BFS</i> is guaranteed to return a path with the lowest number of edges possible.
-     * It does not consider the weight of the edges.<p>
-     *
-     * When all the edges in the provided {@link Graph} have the same weight, <i>BFS</i>
-     * behaves like <i>Dijkstra</i>, but it is more efficient.
+     * Creates a {@link Visit} that implements the <i>Breadth-first search</i> (BFS) algorithm.
+     * <p>
+     * BFS returns a path with the lowest number of edges possible, without considering the
+     * weight of the edges. It should be preferred to <i>Dijkstra</i> when all edges in the
+     * provided {@link Graph} have the same weight.
+     * <p>
+     * The exploration ends when a node equal to {@code target} is found.
      *
      * @param graph a {@link Graph} instance
-     * @return a visit that traverses the provided graph with the <i>BFS</i> algorithm
-     * @throws NullPointerException if graph is {@code null}
-     * @param <N> the type of nodes in graph
+     * @param target the target node to reach
+     * @return a visit that traverses the provided graph using the BFS algorithm
+     * @throws NullPointerException if {@code graph} or {@code target} is {@code null}
+     * @param <N> the type of nodes in the graph
      */
-    public static <N> Visit<N> bfs(Graph<N> graph) {
-        return new BFS<>(graph);
+    public static <N> Visit<N> bfs(Graph<N> graph, N target) {
+        return new BFS<>(graph, target::equals);
     }
 
     /**
-     * Creates a {@link Visit} that implements the <i>Dijkstra</i> algorithm.<p>
-     *
-     * <i>Dijkstra</i> is guaranteed to always return a path with the lowest cost possible.
-     * The cost of a path is the sum of the weights of its constituent edges.
+     * Creates a {@link Visit} that implements the <i>Breadth-first search</i> (BFS) algorithm.
+     * <p>
+     * BFS returns a path with the lowest number of edges possible, without considering the
+     * weight of the edges. It should be preferred to <i>Dijkstra</i> when all edges in the
+     * provided {@link Graph} have the same weight.
+     * <p>
+     * The exploration ends when a node satisfying the {@code targetPredicate} is found.
      *
      * @param graph a {@link Graph} instance
+     * @param targetPredicate a predicate to identify target nodes
+     * @return a visit that traverses the provided graph using the BFS algorithm
+     * @throws NullPointerException if {@code graph} or {@code targetPredicate} is {@code null}
+     * @param <N> the type of nodes in the graph
+     */
+    public static <N> Visit<N> bfs(Graph<N> graph, Predicate<N> targetPredicate) {
+        return new BFS<>(graph, targetPredicate);
+    }
+
+    /**
+     * Creates a {@link Visit} that implements the <i>Dijkstra</i> algorithm.
+     * <p>
+     * Dijkstra is guaranteed to find a path with the lowest cost possible.
+     * <p>
+     * The exploration ends when a node equal to {@code target} is found.
+     *
+     * @param graph a {@link Graph} instance
+     * @param target the target node to reach
+     * @return a visit that traverses the provided graph with the Dijkstra algorithm
+     * @throws NullPointerException if {@code graph} or {@code target} is {@code null}
+     * @param <N> the type of nodes in the graph
+     */
+    public static <N> Visit<N> dijkstra(Graph<N> graph, N target) {
+        return new AStar<>(graph, target::equals);
+    }
+
+    /**
+     * Creates a {@link Visit} that implements the <i>Dijkstra</i> algorithm.
+     * <p>
+     * <i>Dijkstra</i> is guaranteed to find a path with the lowest cost possible.
+     * <p>
+     * The exploration ends when a node satisfying the {@code targetPredicate} is found.
+     *
+     * @param graph a {@link Graph} instance
+     * @param targetPredicate a predicate to identify target nodes
      * @return a visit that traverses the provided graph with the <i>Dijkstra</i> algorithm
-     * @throws NullPointerException if graph is {@code null}
-     * @param <N> the type of nodes in graph
+     * @throws NullPointerException if {@code graph} or {@code targetPredicate} is {@code null}
+     * @param <N> the type of nodes in the graph
      */
-    public static <N> Visit<N> dijkstra(Graph<N> graph) {
-        return new AStar<>(graph, n -> 0);
+    public static <N> Visit<N> dijkstra(Graph<N> graph, Predicate<N> targetPredicate) {
+        return new AStar<>(graph, targetPredicate);
     }
 
     /**
-     * Creates a {@link Visit} that implements an iterative cost-bounded <i>DFS</i> algorithm.<p>
+     * Creates a {@link Visit} that implements an iterative cost-bounded depth-first search (DFS).
+     * <p>
+     * This algorithm repeatedly runs a depth-first search, cutting off a branch when its total
+     * cost exceeds a given threshold. The given threshold is increased at each iteration, until
+     * a solution is found. This algorithm is guaranteed to find a path with the lowest cost possible.
+     * <p>
+     * The exploration ends when a node equal to {@code target} is found.
      *
-     * This algorithm repeatedly runs a depth-first search, cutting off a branch when its
-     * total cost exceeds a given threshold. The given threshold is increased at each
-     * iteration, until a goal is found.<p>
-     *
-     * Compared to <i>Dijkstra</i>, this visit uses much less memory, but often ends up
-     * exploring the same nodes many times.<p>
-     *
-     * This visit is guaranteed to always return a path with the lowest cost possible.
-     * The cost of a path is the sum of the weights of its constituent edges.
-     *
-     * @param graph a {@link Graph} instance
-     * @return a visit that traverses the provided graph with an iterative cost-bounded <i>DFS</i> algorithm
-     * @throws NullPointerException if graph is {@code null}
-     * @param <N> the type of nodes in graph
+     * @param graph a {@link Graph} instance to traverse
+     * @param target the target node to reach
+     * @return a visit that traverses the provided graph using iterative cost-bounded DFS
+     * @throws NullPointerException if {@code graph} or {@code target} is {@code null}
+     * @param <N> the type of nodes in the graph
      */
-    public static <N> Visit<N> iterativeBoundedDFS(Graph<N> graph) {
-        return new IDAStar<>(graph, n -> 0);
+    public static <N> Visit<N> iddfs(Graph<N> graph, N target) {
+        return new IDAStar<>(graph, target::equals);
     }
 
     /**
-     * Creates a {@link Visit} that implements a parallel iterative cost-bounded <i>DFS</i>.<p>
+     * Creates a {@link Visit} that implements an iterative deepening depth-first search (IDDFS).
+     * <p>
+     * This algorithm repeatedly runs a depth-first search, cutting off a branch when its total
+     * cost exceeds a given threshold. The threshold is increased at each iteration until a
+     * solution is found. This algorithm is guaranteed to find a path with the lowest cost possible.
+     * <p>
+     * The exploration ends when a node satisfying the {@code targetPredicate} is found.
      *
-     * The work done in each cost-bounded search iteration is shared among a number of threads.
-     * When a thread has finished its work, it tries to steal some work from the other threads.
-     * When all the work in the current iteration is done, the threads detect termination and a
-     * new iteration is started, until a solution is found.
-     *
-     * @see Visits#iterativeBoundedDFS(Graph)
-     *
-     * @param graph a {@link Graph} instance
-     * @param nThreads number of threads to use
-     * @return a visit that traverses the provided graph with a parallel iterative cost-bounded <i>DFS</i> algorithm
-     * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
-     * @throws IllegalArgumentException if nThreads is less then or equal to zero
-     * @param <N> the type of nodes in graph
+     * @param graph a {@link Graph} instance to traverse
+     * @param targetPredicate a predicate to identify target nodes
+     * @return a visit that traverses the provided graph using iterative cost-bounded DFS
+     * @throws NullPointerException if {@code graph} or {@code target} is {@code null}
+     * @param <N> the type of nodes in the graph
      */
-    public static <N> Visit<N> parallelIterativeBoundedDFS(Graph<N> graph, int nThreads) {
-        return new ParallelIDAStar<>(graph, n -> 0, nThreads);
+    public static <N> Visit<N> iddfs(Graph<N> graph, Predicate<N> targetPredicate) {
+        return new IDAStar<>(graph, targetPredicate);
+    }
+
+    /**
+     * Creates a {@link Visit} that implements a parallel iterative deepening depth-first search (IDDFS).
+     * <p>
+     * This algorithm repeatedly runs a depth-first search, cutting off a branch when its total
+     * cost exceeds a given threshold. The threshold is increased at each iteration until a
+     * solution is found. This algorithm is guaranteed to find a path with the lowest cost possible.
+     * The work for each cost-bounded search iteration is distributed among multiple threads.
+     * <p>
+     * The exploration ends when a node equal to {@code target} is found.
+     *
+     * @param graph a {@link Graph} instance to traverse
+     * @param target the target node to reach
+     * @param nThreads the number of threads to use for parallel search
+     * @return a visit that traverses the provided graph using parallel iterative cost-bounded DFS
+     * @throws NullPointerException if {@code graph} or {@code target} is {@code null}
+     * @throws IllegalArgumentException if {@code nThreads} is less than or equal to zero
+     * @param <N> the type of nodes in the graph
+     */
+    public static <N> Visit<N> iddfsParallel(Graph<N> graph, N target, int nThreads) {
+        return new ParallelIDAStar<>(graph, target::equals, nThreads);
+    }
+
+    /**
+     * Creates a {@link Visit} that implements a parallel iterative deepening depth-first search (IDDFS).
+     * <p>
+     * This algorithm repeatedly runs a depth-first search, cutting off a branch when its total
+     * cost exceeds a given threshold. The threshold is increased at each iteration until a
+     * solution is found. This algorithm is guaranteed to find a path with the lowest cost possible.
+     * The work for each cost-bounded search iteration is distributed among multiple threads.
+     * <p>
+     * The exploration ends when a node equal to {@code target} is found.
+     *
+     * @param graph a {@link Graph} instance to traverse
+     * @param targetPredicate a predicate to identify target nodes
+     * @param nThreads the number of threads to use for parallel search
+     * @return a visit that traverses the provided graph using parallel iterative cost-bounded DFS
+     * @throws NullPointerException if {@code graph} or {@code target} is {@code null}
+     * @throws IllegalArgumentException if {@code nThreads} is less than or equal to zero
+     * @param <N> the type of nodes in the graph
+     */
+    public static <N> Visit<N> iddfsParallel(Graph<N> graph, Predicate<N> targetPredicate, int nThreads) {
+        return new ParallelIDAStar<>(graph, targetPredicate, nThreads);
     }
 }

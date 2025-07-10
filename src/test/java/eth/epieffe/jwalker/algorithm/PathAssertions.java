@@ -34,6 +34,5 @@ class PathAssertions {
             assertTrue(valid, "Invalid move");
             current = edge.destination;
         }
-        assertTrue(graph.isTarget(current), "Invalid solution");
     }
 }

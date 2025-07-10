@@ -27,6 +27,7 @@ import java.util.List;
 
 import static eth.epieffe.jwalker.algorithm.PathAssertions.assertValidPath;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class IDAStarTest {
 
@@ -36,6 +37,7 @@ public class IDAStarTest {
         Visit<NPuzzle> visit = new IDAStar<>(graph, NPuzzleHeuristics::manhattanSum);
         NPuzzle start = NPuzzle.newInstance(8, 7, 4, 1, 6, 3, 2, 5, 0);
         List<Edge<NPuzzle>> path = visit.run(start);
+        assertTrue(path.get(path.size() - 1).destination.isSolved());
         assertValidPath(graph, start, path);
         assertEquals(22, path.size());
     }
@@ -46,6 +48,7 @@ public class IDAStarTest {
         Visit<NPuzzle> visit = new IDAStar<>(graph, NPuzzleHeuristics::outOfPlace);
         NPuzzle start = NPuzzle.newInstance(5, 3, 7, 4, 0, 6, 1, 2, 8);
         List<Edge<NPuzzle>> path = visit.run(start);
+        assertTrue(path.get(path.size() - 1).destination.isSolved());
         assertValidPath(graph, start, path);
         assertEquals(22, path.size());
     }
@@ -53,9 +56,10 @@ public class IDAStarTest {
     @Test
     public void test8PuzzleWithIterativeBoundedDFS() {
         Graph<NPuzzle> graph = NPuzzleGraph.INSTANCE;
-        Visit<NPuzzle> visit = new IDAStar<>(graph, c -> 0);
+        Visit<NPuzzle> visit = new IDAStar<>(graph, NPuzzle::isSolved);
         NPuzzle start = NPuzzle.newInstance(7, 1, 2, 4, 8, 3, 5, 0, 6);
         List<Edge<NPuzzle>> path = visit.run(start);
+        assertTrue(path.get(path.size() - 1).destination.isSolved());
         assertValidPath(graph, start, path);
         assertEquals(13, path.size());
     }

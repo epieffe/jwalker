@@ -23,7 +23,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SteepestDescentTest {
 
@@ -37,24 +37,24 @@ public class SteepestDescentTest {
     @MethodSource("nQueens8Provider")
     public void test8QueensWithNThreatsHeuristic(NQueens start) {
         NQueens sol = search.run(start);
-        boolean isSolved = NQueensGraph.INSTANCE.isTarget(sol);
+        int numThreats = NQueensHeuristics.numThreats(sol);
         // Retry up to 10 times
-        for (int retry = 0; !isSolved && retry < 10; ++retry) {
-            isSolved = NQueensGraph.INSTANCE.isTarget(sol);
+        for (int retry = 0; numThreats > 0 && retry < 10; ++retry) {
+            numThreats = NQueensHeuristics.numThreats(sol);
         }
-        assertTrue(isSolved);
+        assertEquals(0, numThreats);
     }
 
     @ParameterizedTest
     @MethodSource("nQueens50Provider")
     public void test50QueensWithNThreatsHeuristic(NQueens start) {
         NQueens sol = search.run(start);
-        boolean isSolved = NQueensGraph.INSTANCE.isTarget(sol);
+        int numThreats = NQueensHeuristics.numThreats(sol);
         // Retry up to 20 times
-        for (int retry = 0; !isSolved && retry < 20; ++retry) {
-            isSolved = NQueensGraph.INSTANCE.isTarget(sol);
+        for (int retry = 0; numThreats > 0 && retry < 20; ++retry) {
+            numThreats = NQueensHeuristics.numThreats(sol);
         }
-        assertTrue(isSolved);
+        assertEquals(0, numThreats);
     }
 
     static Stream<NQueens> nQueens8Provider() {

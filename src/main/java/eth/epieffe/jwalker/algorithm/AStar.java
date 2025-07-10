@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static eth.epieffe.jwalker.algorithm.Util.buildPath;
 
@@ -44,11 +45,14 @@ public final class AStar<N> implements Visit<N> {
 
     private final Heuristic<N> heuristic;
 
+    private final Predicate<N> targetPredicate;
+
     private final double hMul;
 
     /**
-     * Allocates an {@code AStar} object and initializes it with the
-     * provided {@link Graph} and {@link Heuristic}.
+     * Allocates an {@code AStar} object and initializes it with the provided
+     * {@link Graph} and {@link Heuristic}. Any node for which the provided
+     * heuristic evaluates to zero is considered a target node.
      *
      * @param graph a {@link Graph} instance
      * @param heuristic a {@link Heuristic} instance
@@ -62,20 +66,48 @@ public final class AStar<N> implements Visit<N> {
      * Allocates an {@code AStar} object and initializes it with the
      * provided {@link Graph}, {@link Heuristic} and a heuristic
      * multiplier. The higher the heuristic multiplier is, the more
-     * greedy the algorithm behaves.
+     * greedy the algorithm behaves. Any node for which the provided
+     * heuristic evaluates to zero is considered a target node.
      *
      * @param graph a {@link Graph} instance
      * @param heuristic a {@link Heuristic} instance
      * @param hMul the heuristic multiplier
      * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
+     */
+    public AStar(Graph<N> graph, Heuristic<N> heuristic, int hMul) {
+        this(graph, heuristic, null, hMul);
+    }
+
+    /**
+     * Allocates an {@code AStar} object and initializes it with the
+     * provided {@link Graph} and a {@code Predicate} to determine if a provided
+     * node is a target node.
+     *
+     * @param graph a {@link Graph} instance
+     * @param targetPredicate a predicate that determines if a provided node is a target node
+     * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
+     */
+    public AStar(Graph<N> graph, Predicate<N> targetPredicate) {
+        this(graph, n -> 0, Objects.requireNonNull(targetPredicate), 1);
+    }
+
+    /**
+     * Allocates an {@code AStar} object.
+     *
+     * @param graph a {@link Graph} instance
+     * @param heuristic a {@link Heuristic} instance
+     * @param targetPredicate a predicate that determines if a given node is a target node
+     * @param hMul the heuristic multiplier
+     * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
      * @throws IllegalArgumentException if hMul is less then 1
      */
-    public AStar(Graph<N> graph, Heuristic<N> heuristic, double hMul) {
+    public AStar(Graph<N> graph, Heuristic<N> heuristic, Predicate<N> targetPredicate, double hMul) {
         if (hMul < 1) {
             throw new IllegalArgumentException("Argument hMul must be >= 1");
         }
         this.graph = Objects.requireNonNull(graph);
         this.heuristic = Objects.requireNonNull(heuristic);
+        this.targetPredicate = targetPredicate;
         this.hMul = hMul;
     }
 
@@ -94,7 +126,7 @@ public final class AStar<N> implements Visit<N> {
             if (onVisit != null) {
                 onVisit.accept(current);
             }
-            if (graph.isTarget(current)) {
+            if (targetPredicate == null ? currentNode.h == 0 : targetPredicate.test(current)) {
                 return buildPath(currentNode);
             }
             for (Edge<N> edge : graph.outgoingEdges(current)) {

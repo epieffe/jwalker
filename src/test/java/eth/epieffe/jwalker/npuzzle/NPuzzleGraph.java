@@ -69,29 +69,6 @@ public class NPuzzleGraph implements Graph<NPuzzle> {
         return edgeList;
     }
 
-    /**
-     * Returns {@code true} if the provided {@link NPuzzle}
-     * instance is a target.
-     *
-     * @param node an instance of {@link NPuzzle}
-     * @return {@code true} if node is a target
-     * @throws NullPointerException if node is {@code null}
-     */
-    @Override
-    public boolean isTarget(NPuzzle node) {
-        // The last cell must be empty
-        if (node.table[node.table.length - 1] > 0) {
-            return false;
-        }
-        // The other cells must be ordered from 1 to n-1
-        for (int i = 1; i < node.table.length; ++i) {
-            if (node.table[i - 1] != i) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     private static NPuzzle swapEmptyCell(NPuzzle nPuzzle, int newEmptyIndex) {
         byte[] newTable = nPuzzle.table.clone();
         newTable[nPuzzle.emptyIndex] = nPuzzle.table[newEmptyIndex];

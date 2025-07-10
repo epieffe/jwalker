@@ -28,17 +28,20 @@ import java.util.stream.Stream;
 
 import static eth.epieffe.jwalker.algorithm.PathAssertions.assertValidPath;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BFSTest {
 
     public static class TestCase {
         public final Graph<Cell> graph;
         public final Cell startCell;
+        public final Cell targetCell;
         public final double totalCost;
 
-        public TestCase(Graph<Cell> graph, Cell startCell, double totalCost) {
+        public TestCase(Graph<Cell> graph, Cell startCell, Cell targetCell, double totalCost) {
             this.graph = graph;
             this.startCell = startCell;
+            this.targetCell = targetCell;
             this.totalCost = totalCost;
         }
     }
@@ -46,8 +49,9 @@ public class BFSTest {
     @ParameterizedTest
     @MethodSource("gridPathfindingProvider")
     public void testGridPathfinding(TestCase test) {
-        Visit<Cell> visit = new BFS<>(test.graph);
+        Visit<Cell> visit = new BFS<>(test.graph, test.targetCell::equals);
         List<Edge<Cell>> path = visit.run(test.startCell);
+        assertEquals(test.targetCell, path.get(path.size() - 1).destination);
         assertValidPath(test.graph, test.startCell, path);
         assertEquals(test.totalCost, path.size());
     }
@@ -67,7 +71,8 @@ public class BFSTest {
         };
         MazeGraph graph1 = MazeGraph.newInstance(grid1, 9, 6);
         Cell start1 = new Cell(4, 2);
-        TestCase test1 = new TestCase(graph1, start1, 8);
+        Cell target1 = new Cell(9, 6);
+        TestCase test1 = new TestCase(graph1, start1, target1, 8);
 
         return Stream.of(test1);
     }

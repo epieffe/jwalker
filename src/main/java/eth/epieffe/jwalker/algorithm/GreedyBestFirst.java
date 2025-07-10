@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static eth.epieffe.jwalker.algorithm.Util.buildPath;
 
@@ -44,6 +45,21 @@ public final class GreedyBestFirst<N> implements Visit<N> {
 
     private final Heuristic<N> heuristic;
 
+    private final Predicate<N> targetPredicate;
+
+    /**
+     * Allocates a {@code GreedyBestFirst} object and initializes it with the
+     * provided {@link Graph} and {@link Heuristic}. Any node for which the provided
+     * heuristic evaluates to zero is considered a target node.
+     *
+     * @param graph a {@link Graph} instance
+     * @param heuristic a {@link Heuristic} instance
+     * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
+     */
+    public GreedyBestFirst(Graph<N> graph, Heuristic<N> heuristic) {
+        this(graph, heuristic, null);
+    }
+
     /**
      * Allocates a {@code GreedyBestFirst} object and initializes it with the
      * provided {@link Graph} and {@link Heuristic}.
@@ -52,25 +68,27 @@ public final class GreedyBestFirst<N> implements Visit<N> {
      * @param heuristic a {@link Heuristic} instance
      * @throws NullPointerException if graph is {@code null} or heuristic is {@code null}
      */
-    public GreedyBestFirst(Graph<N> graph, Heuristic<N> heuristic) {
+    public GreedyBestFirst(Graph<N> graph, Heuristic<N> heuristic, Predicate<N> targetPredicate) {
         this.graph = Objects.requireNonNull(graph);
         this.heuristic = Objects.requireNonNull(heuristic);
+        this.targetPredicate = targetPredicate;
     }
 
     @Override
     public List<Edge<N>> run(N start, Consumer<N> onVisit) {
         FibonacciHeap<N> openSet = new FibonacciHeap<>();
         Map<N, Node<N>> nodes = new HashMap<>();
-        openSet.insert(0, start);
+        openSet.insert(heuristic.eval(start), start);
         nodes.put(start, new Node<>(null, null));
 
         while (!openSet.isEmpty()) {
-            N current = openSet.deleteMin().getValue();
+            FibonacciHeap.Handle<N> handle = openSet.deleteMin();
+            N current = handle.getValue();
             Node<N> currentNode = nodes.get(current);
             if (onVisit != null) {
                 onVisit.accept(current);
             }
-            if (graph.isTarget(current)) {
+            if (targetPredicate == null ? handle.getKey() == 0 : targetPredicate.test(current)) {
                 return buildPath(currentNode);
             }
             for (Edge<N> edge : graph.outgoingEdges(current)) {

@@ -45,13 +45,4 @@ public interface Graph<N> {
      * @throws NullPointerException if node is {@code null}
      */
     List<Edge<N>> outgoingEdges(N node);
-
-    /**
-     * Returns {@code true} if the specified node is a target.
-     *
-     * @param node a node in this graph
-     * @return {@code true} if the specified node is a target
-     * @throws NullPointerException if node is {@code null}
-     */
-    boolean isTarget(N node);
 }

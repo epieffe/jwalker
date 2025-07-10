@@ -26,11 +26,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static eth.epieffe.jwalker.algorithm.Util.buildPath;
 
 /**
- * A {@link Visit} that implements the <i>BFS</i> algorithm.
+ * A {@link Visit} that implements the <i>Breadth-first search</i> (BFS) algorithm.
+ * <p>
+ * BFS returns a path with the lowest number of edges possible, without considering
+ * the weight of the edges.
  *
  * @param <N> the type of nodes in the graph traversed by this visit
  *
@@ -42,15 +46,18 @@ public final class BFS<N> implements Visit<N> {
 
     private final Graph<N> graph;
 
+    private final Predicate<N> targetPredicate;
+
     /**
-     * Allocates a {@code BFS} object and initializes it with the
-     * provided {@link Graph}.
+     * Constructs a new BFS instance with the specified graph and target predicate.
      *
      * @param graph a {@link Graph} instance
-     * @throws NullPointerException if graph is {@code null}
+     * @param targetPredicate a predicate to identify target nodes
+     * @throws NullPointerException if {@code graph} or {@code targetPredicate} is {@code null}
      */
-    public BFS(Graph<N> graph) {
+    public BFS(Graph<N> graph, Predicate<N> targetPredicate) {
         this.graph = Objects.requireNonNull(graph);
+        this.targetPredicate = Objects.requireNonNull(targetPredicate);
     }
 
     @Override
@@ -65,7 +72,7 @@ public final class BFS<N> implements Visit<N> {
             if (onVisit != null) {
                 onVisit.accept(current);
             }
-            if (graph.isTarget(current)) {
+            if (targetPredicate.test(current)) {
                 return buildPath(currentNode);
             }
             for (Edge<N> edge : graph.outgoingEdges(current)) {
