@@ -18,13 +18,11 @@ package eth.epieffe.jwalker;
 import java.util.List;
 
 /**
- * A graph that can be traversed by search algorithms such as <i>A*</i> or
- * <i>Dijkstra</i>. Methods are provided to retrieve the outgoing edges of a
- * specified node, and to check if a specified node is a target.<p>
- *
- * A {@code Graph} describes a search problem, and can be traversed with a
- * {@link Visit} or a {@link LocalSearch}.<p>
- *
+ * A graph that can be traversed by search algorithms such as A* or Dijkstra.
+ * Provides a method to retrieve the outgoing edges of a specified node.
+ * <p>
+ * {@code Graph} instances can be traversed with a {@link Visit} or a {@link LocalSearch}.
+ * <p>
  * Nodes of a {@code Graph} can be of any type, but they should implement
  * the {@code equals} and {@code hashCode} methods correctly.
  *
@@ -42,7 +40,7 @@ public interface Graph<N> {
      *
      * @param node a node in this graph
      * @return the outgoing edges of the specified node
-     * @throws NullPointerException if node is {@code null}
+     * @throws NullPointerException if {@code node} is {@code null}
      */
     List<Edge<N>> outgoingEdges(N node);
 }

@@ -16,26 +16,26 @@
 package eth.epieffe.jwalker;
 
 /**
- * A heuristic function for nodes in a {@link Graph}.<p>
- *
+ * A heuristic function for nodes in a {@link Graph}.
+ * <p>
  * A {@code Heuristic} provides a rough estimate of the lowest path cost from a provided
  * node in a {@link Graph} to a target node. The cost of a path is the sum of the weights
- * of its constituent edges.<p>
- *
+ * of its constituent edges.
+ * <p>
  * Although a heuristic may be inaccurate, it should be quick to evaluate, and it is used
- * by informed search algorithms, such as <i>A*</i> or <i>Best-first Search</i>, to decide
- * which nodes to explore with a higher priority.<p>
- *
+ * by informed search algorithms, such as A* or Best-first Search, to decide which nodes to
+ * explore with a higher priority.
+ * <p>
  * A heuristic estimate must never be less than zero. If the provided node is a target
  * node, the estimate for that node should be zero.
  *
  * <h2>Consistent heuristics</h2><p>
  * A heuristic is said to be <i>consistent</i> if its estimate is always less than or equal
  * to the estimate for any neighbour of the provided node, plus the cost of reaching that
- * neighbour from the provided node.<p>
- *
- * Consistency is a desirable property for heuristics. When the <i>A*</i> algorithm uses a
- * consistent heuristic, it is guaranteed to always return a path with the lowest cost possible.
+ * neighbour from the provided node.
+ * <p>
+ * Consistency is a desirable property for heuristics. When the A* algorithm uses a consistent
+ * heuristic, it is guaranteed to always return a path with the lowest cost possible.
  *
  * @param <N> the type of graph nodes this heuristic evaluates
  *
@@ -47,10 +47,10 @@ package eth.epieffe.jwalker;
 public interface Heuristic<N> {
 
     /**
-     * Returns a rough estimate of the lowest path cost from a provided
-     * node to a target node.<p>
-     *
-     * The returned value must never be less than zero.
+     * Returns a rough estimate of the lowest path cost from the specified
+     * node to a target node.
+     * <p>
+     * The result is always greater than or equal to zero.
      *
      * @param node a node in a {@link Graph}
      * @return the heuristic evaluation for the provided node

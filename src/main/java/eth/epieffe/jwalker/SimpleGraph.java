@@ -22,14 +22,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * A simple immutable {@link Graph} implementation.
+ * <p>
+ * Instances are constructed using the {@link SimpleGraph.Builder} class. Users
+ * explicitly define edges between nodes using the provided builder methods.
+ *
+ * @param <N> the type of nodes in this graph
+ */
 public class SimpleGraph<N> implements Graph<N> {
 
     private final Map<N, List<Edge<N>>> edges;
 
+    /**
+     * Returns a builder to create {@link SimpleGraph} instances.
+     *
+     * @return a new {@link SimpleGraph.Builder} instance
+     * @param <N> the type of nodes in the graph
+     */
     public static <N> Builder<N> builder() {
         return new Builder<>();
     }
 
+    /**
+     * Returns a builder to create {@link SimpleGraph} instances.
+     *
+     * @param clazz the {@link Class} object representing the node type
+     * @return a new {@link SimpleGraph.Builder} instance
+     * @param <N> the type of nodes in the graph
+     */
     @SuppressWarnings("unused")
     public static <N> Builder<N> builder(Class<N> clazz) {
         return new Builder<>();

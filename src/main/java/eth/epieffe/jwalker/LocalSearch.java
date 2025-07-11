@@ -18,20 +18,19 @@ package eth.epieffe.jwalker;
 import java.util.function.Consumer;
 
 /**
- * A local search algorithm that traverses a {@link Graph} to find a target node.<p>
- *
- * A {@code LocalSearch} is used to solve a computationally hard optimization
- * problem. It starts from one or more randomly generated nodes and navigates the
- * {@link Graph} until a node deemed optimal is found or a time bound is elapsed.
- * A {@link Heuristic} is used to evaluate nodes and decide how to navigate the
- * {@link Graph} accordingly.<p>
- *
+ * A local search algorithm that traverses a {@link Graph} to find a target node.
+ * <p>
+ * A {@code LocalSearch} is used to solve computationally hard optimization problems.
+ * It starts from one or more randomly generated nodes and navigates the {@link Graph}
+ * until a node deemed optimal is found or a time bound is elapsed. A {@link Heuristic}
+ * is used to evaluate nodes and decide how to navigate the {@link Graph} accordingly.
+ * <p>
  * Unlike a {@link Visit}, a {@code LocalSearch} does not return a path, but
- * only one node is returned.<p>
- *
+ * only one node is returned.
+ * <p>
  * Optionally, users can provide a {@link Consumer} that will be called on each
- * explored node when it is visited.<p>
- *
+ * explored node when it is visited.
+ * <p>
  * The {@link LocalSearches} class provides factory methods for various local search
  * algorithms.
  *
@@ -62,8 +61,8 @@ public interface LocalSearch<N> {
      * underlying {@link Graph} in search for a node that minimizes
      * the heuristic evaluation. The returned node is not guaranteed
      * to have the lowest heuristic possible. Subsequent runs might
-     * find a better node.<p>
-     *
+     * find a better node.
+     * <p>
      * If a {@link Consumer} is provided, it will be executed on each
      * explored node when it is visited.
      *

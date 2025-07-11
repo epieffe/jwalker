@@ -20,18 +20,17 @@ import java.util.function.Consumer;
 
 /**
  * A pathfinding algorithm that traverses a {@link Graph} to find a path from a
- * provided node to a target node.<p>
- *
+ * specified node to a target node.
+ * <p>
  * Some {@code Visit} implementations are guaranteed to find a path with the lowest
  * cost possible, while others sacrifice optimality for efficiency. Some implementations
- * use a {@link Heuristic} to decide which nodes to explore with a higher priority.<p>
- *
+ * use a {@link Heuristic} to decide which nodes to explore with a higher priority.
+ * <p>
  * Optionally, users can provide a {@link Consumer} that will be called on each
- * explored node when it is visited.<p>
- *
+ * explored node when it is visited.
+ * <p>
  * The {@link Visits} class provides factory methods for various pathfinding
- * algorithms such as <i>Dijkstra</i>, <i>A*</i>, <i>Best-first Search</i>
- * and <i>Breadth-first Search</i>.
+ * algorithms such as Dijkstra, A*, Best-first Search and Breadth-first Search.
  *
  * @param <N> the type of nodes in the graph traversed by this visit
  *
@@ -45,14 +44,13 @@ public interface Visit<N> {
 
     /**
      * Traverses the underlying {@link Graph} and returns a list of
-     * edges that bring from the specified node to a target node.<p>
-     *
+     * edges that bring from the specified node to a target node.
+     * <p>
      * If no valid path is found returns {@code null}.
      *
      * @param node a node in the underlying graph
-     * @return a path from the specified node to a target node, or
-     * {@code null} if no valid path is found
-     * @throws NullPointerException if node is {@code null}
+     * @return a path from the specified node to a target node, or {@code null} if no valid path is found
+     * @throws NullPointerException if {@code node} is {@code null}
      */
     default List<Edge<N>> run(N node) {
         return run(node, null);
@@ -60,18 +58,17 @@ public interface Visit<N> {
 
     /**
      * Traverses the underlying {@link Graph} and returns a list of
-     * edges that bring from the specified node to a target node.<p>
-     *
-     * If no valid path is found returns {@code null}.<p>
-     *
+     * edges that bring from the specified node to a target node.
+     * <p>
+     * If no valid path is found returns {@code null}.
+     * <p>
      * If a {@link Consumer} is provided, it will be executed on each
      * explored node when it is visited.
      *
      * @param node a node in the underlying graph
      * @param onVisit a callback that will be executed on each visited node
-     * @return a path from the specified node to a target node, or
-     * {@code null} if no valid path is found
-     * @throws NullPointerException if node is {@code null}
+     * @return a path from the specified node to a target node, or {@code null} if no valid path is found
+     * @throws NullPointerException if {@code node} is {@code null}
      */
     List<Edge<N>> run(N node, Consumer<N> onVisit);
 
