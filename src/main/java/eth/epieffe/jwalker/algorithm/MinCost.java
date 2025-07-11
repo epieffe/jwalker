@@ -109,7 +109,7 @@ public final class MinCost<N> implements Visit<N> {
      *
      * @param graph a {@link Graph} instance
      * @param heuristic a {@link Heuristic} function to estimate the cost to the target
-     * @param targetPredicate a predicate that identifies target nodes, or {@code null}
+     * @param targetPredicate a predicate that identifies target nodes
      * @param hMul the heuristic multiplier
      * @throws NullPointerException if {@code graph} or {@code heuristic} are {@code null}
      * @throws IllegalArgumentException if {@code hMul} is less than 1

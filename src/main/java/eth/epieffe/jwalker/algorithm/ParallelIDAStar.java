@@ -35,6 +35,21 @@ import java.util.function.Predicate;
 
 import static eth.epieffe.jwalker.algorithm.IDAStar.IDANode;
 
+/**
+ * A {@link Visit} that implements a parallel version of IDA* or IDDFS, depending on
+ * the parameters provided in the constructor.
+ * <p>
+ * If no {@link Heuristic} is provided, the behavior is equivalent to a standard
+ * iterative deepening depth-first search (IDDFS), while if a non-trivial heuristic
+ * function is provided, the behavior corresponds to the IDA* search.
+ *
+ * @param <N> the type of nodes in the graph traversed by this visit
+ *
+ * @see Visit
+ * @see Heuristic
+ * @see Graph
+ * @author Epifanio Ferrari
+ */
 public class ParallelIDAStar<N> implements Visit<N> {
 
     private static final ExecutorService executor = new ThreadPoolExecutor(
@@ -51,14 +66,53 @@ public class ParallelIDAStar<N> implements Visit<N> {
 
     private final int nThreads;
 
+    /**
+     * Constructs a new instance with the behaviour of the IDA* algorithm. The number
+     * of threads used for parallel execution is determined by the {@code nThreads} parameter.
+     * <p>
+     * Nodes for which the provided {@link Heuristic} evaluates to zero are
+     * considered target nodes.
+     *
+     * @param graph a {@link Graph} instance
+     * @param heuristic a {@link Heuristic} instance
+     * @param nThreads the number of threads to use for parallel search
+     * @throws NullPointerException if {@code graph} or {@code heuristic} is {@code null}
+     * @throws IllegalArgumentException if {@code nThreads} is less than or equal to zero
+     */
     public ParallelIDAStar(Graph<N> graph, Heuristic<N> heuristic, int nThreads) {
         this(graph, heuristic, null, nThreads);
     }
 
+    /**
+     * Constructs a new instance with the behaviour of the IDDFS algorithm. The number
+     * of threads used for parallel execution is determined by the {@code nThreads} parameter.
+     * <p>
+     * Nodes satisfying the {@code targetPredicate} are considered target nodes.
+     *
+     * @param graph a {@link Graph} instance
+     * @param targetPredicate a predicate that identifies the target nodes
+     * @param nThreads the number of threads to use for parallel search
+     * @throws NullPointerException if {@code graph} or {@code targetPredicate} is {@code null}
+     * @throws IllegalArgumentException if {@code nThreads} is less than or equal to zero
+     */
     public ParallelIDAStar(Graph<N> graph, Predicate<N> targetPredicate, int nThreads) {
         this(graph, n -> 0, Objects.requireNonNull(targetPredicate), nThreads);
     }
 
+    /**
+     * Constructs a new instance with fully customizable parameters. The number
+     * of threads used for parallel execution is determined by the {@code nThreads} parameter.
+     * <p>
+     * If {@code targetPredicate} is not {@code null}, it is used to identify target nodes.
+     * Otherwise, nodes for which the provided {@link Heuristic} evaluates to zero are
+     * considered target nodes.
+     *
+     * @param graph a {@link Graph} instance
+     * @param heuristic a {@link Heuristic} function to estimate the cost to the target
+     * @param targetPredicate a predicate that identifies target nodes
+     * @throws NullPointerException if {@code graph} or {@code heuristic} are {@code null}
+     * @throws IllegalArgumentException if {@code nThreads} is less than or equal to zero
+     */
     public ParallelIDAStar(Graph<N> graph, Heuristic<N> heuristic, Predicate<N> targetPredicate, int nThreads) {
         if (nThreads <= 0) {
             throw new IllegalArgumentException("Argument nThreads must be greater than zero");

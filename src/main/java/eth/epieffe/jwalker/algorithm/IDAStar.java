@@ -27,7 +27,12 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
- * A {@link Visit} that implements the <i>IDA*</i> algorithm.
+ * A {@link Visit} that implements IDA* or IDDFS, depending on the parameters
+ * provided in the constructor.
+ * <p>
+ * If no {@link Heuristic} is provided, the behavior is equivalent to a standard
+ * iterative deepening depth-first search (IDDFS), while if a non-trivial heuristic
+ * function is provided, the behavior corresponds to the IDA* search.
  *
  * @param <N> the type of nodes in the graph traversed by this visit
  *
@@ -46,14 +51,45 @@ public class IDAStar<N> implements Visit<N> {
 
     private final Predicate<N> targetPredicate;
 
+    /**
+     * Constructs a new instance with the behaviour of the IDA* algorithm.
+     * <p>
+     * Nodes for which the provided {@link Heuristic} evaluates to zero are
+     * considered target nodes.
+     *
+     * @param graph a {@link Graph} instance
+     * @param heuristic a {@link Heuristic} instance
+     * @throws NullPointerException if {@code graph} or {@code heuristic} is {@code null}
+     */
     public IDAStar(Graph<N> graph, Heuristic<N> heuristic) {
         this(graph, heuristic, null);
     }
 
+    /**
+     * Constructs a new instance with the behaviour of the IDDFS algorithm.
+     * <p>
+     * Nodes satisfying the {@code targetPredicate} are considered target nodes.
+     *
+     * @param graph a {@link Graph} instance
+     * @param targetPredicate a predicate that identifies the target nodes
+     * @throws NullPointerException if {@code graph} or {@code targetPredicate} is {@code null}
+     */
     public IDAStar(Graph<N> graph, Predicate<N> targetPredicate) {
         this(graph, n -> 0, Objects.requireNonNull(targetPredicate));
     }
 
+    /**
+     * Constructs a new instance with fully customizable parameters.
+     * <p>
+     * If {@code targetPredicate} is not {@code null}, it is used to identify target nodes.
+     * Otherwise, nodes for which the provided {@link Heuristic} evaluates to zero are
+     * considered target nodes.
+     *
+     * @param graph a {@link Graph} instance
+     * @param heuristic a {@link Heuristic} function to estimate the cost to the target
+     * @param targetPredicate a predicate that identifies target nodes
+     * @throws NullPointerException if {@code graph} or {@code heuristic} are {@code null}
+     */
     public IDAStar(Graph<N> graph, Heuristic<N> heuristic, Predicate<N> targetPredicate) {
         this.graph = Objects.requireNonNull(graph);
         this.heuristic = Objects.requireNonNull(heuristic);

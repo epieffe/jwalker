@@ -17,7 +17,7 @@ package eth.epieffe.jwalker;
 
 import eth.epieffe.jwalker.algorithm.MinCost;
 import eth.epieffe.jwalker.algorithm.BFS;
-import eth.epieffe.jwalker.algorithm.GreedyBestFirst;
+import eth.epieffe.jwalker.algorithm.BestFirst;
 import eth.epieffe.jwalker.algorithm.IDAStar;
 import eth.epieffe.jwalker.algorithm.ParallelIDAStar;
 
@@ -95,7 +95,7 @@ public final class Visits {
      * @param <N> the type of nodes in the graph
      */
     public static <N> Visit<N> bestFirst(Graph<N> graph, Heuristic<N> heuristic) {
-        return new GreedyBestFirst<>(graph, heuristic);
+        return new BestFirst<>(graph, heuristic);
     }
 
     /**

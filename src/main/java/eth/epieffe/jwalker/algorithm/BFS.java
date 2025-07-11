@@ -49,7 +49,8 @@ public final class BFS<N> implements Visit<N> {
     private final Predicate<N> targetPredicate;
 
     /**
-     * Constructs a new BFS instance with the specified graph and target predicate.
+     * Constructs a new {@code BFS} instance with the specified
+     * {@link Graph} and target predicate.
      *
      * @param graph a {@link Graph} instance
      * @param targetPredicate a predicate to identify target nodes
