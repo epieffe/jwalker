@@ -62,7 +62,7 @@ public class NQueensGraph implements Graph<NQueens> {
                         }
                     }
                     NQueens newConfig = new NQueens(newPosArray);
-                    Edge<NQueens> edge = new Edge<>(null, 1, newConfig);
+                    Edge<NQueens> edge = new Edge<>(newConfig, 1);
                     edgeList.add(edge);
                 }
             }

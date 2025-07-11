@@ -103,7 +103,7 @@ public class SimpleGraph<N> implements Graph<N> {
          * @return a reference to this object
          */
         public Builder<N> addEdge(N from, N to, double weight, String label) {
-            Edge<N> edge = new Edge<>(label, weight, to);
+            Edge<N> edge = new Edge<>(to, weight, label);
             edges.computeIfAbsent(from, k -> new ArrayList<>()).add(edge);
             return this;
         }

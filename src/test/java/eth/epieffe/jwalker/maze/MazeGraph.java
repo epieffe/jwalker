@@ -83,7 +83,7 @@ public class MazeGraph implements Graph<Cell> {
                 byte cost = grid[newRow][newCol];
                 if (cost > 0) {
                     Cell newCell = new Cell(newRow, newCol);
-                    edges.add(new Edge<>(moveNames[i], cost, newCell));
+                    edges.add(new Edge<>(newCell, cost, moveNames[i]));
                 }
             }
         }

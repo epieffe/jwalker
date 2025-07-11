@@ -25,9 +25,9 @@ import java.util.Objects;
 public final class Edge<T> {
 
     /**
-     * The label of this edge.
+     * The destination node of this edge.
      */
-    public final String label;
+    public final T destination;
 
     /**
      * The cost of traversing this edge to reach the destination node
@@ -36,30 +36,40 @@ public final class Edge<T> {
     public final double weight;
 
     /**
-     * The destination node of this edge.
+     * The label of this edge.
      */
-    public final T destination;
+    public final String label;
 
     /**
      * Creates a new {@code Edge}.
      *
-     * @param label the label of the new edge
-     * @param weight the weight of the new edge
      * @param destination the destination node of the new edge
+     * @param weight the weight of the new edge
      */
-    public Edge(String label, double weight, T destination) {
-        this.label = label;
-        this.weight = weight;
-        this.destination = destination;
+    public Edge(T destination, double weight) {
+        this(destination, weight, null);
     }
 
     /**
-     * Returns the label of this edge.
+     * Creates a new {@code Edge}.
      *
-     * @return the label of this edge
+     * @param destination the destination node of the new edge
+     * @param weight the weight of the new edge
+     * @param label the label of the new edge
      */
-    public String label() {
-        return label;
+    public Edge(T destination, double weight, String label) {
+        this.destination = destination;
+        this.weight = weight;
+        this.label = label;
+    }
+
+    /**
+     * Returns the destination node of this edge.
+     *
+     * @return the destination node of this edge
+     */
+    public T destination() {
+        return destination;
     }
 
     /**
@@ -73,12 +83,12 @@ public final class Edge<T> {
     }
 
     /**
-     * Returns the destination node of this edge.
+     * Returns the label of this edge.
      *
-     * @return the destination node of this edge
+     * @return the label of this edge
      */
-    public T destination() {
-        return destination;
+    public String label() {
+        return label;
     }
 
     @Override
@@ -86,13 +96,13 @@ public final class Edge<T> {
         if (this == o) return true;
         if (!(o instanceof Edge)) return false;
         Edge<?> other = (Edge<?>) o;
-        return weight == other.weight &&
-                Objects.equals(label, other.label) &&
-                Objects.equals(destination, other.destination);
+        return Objects.equals(destination, other.destination) &&
+                weight == other.weight &&
+                Objects.equals(label, other.label);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(label, weight, destination);
+        return Objects.hash(destination, weight, label);
     }
 }

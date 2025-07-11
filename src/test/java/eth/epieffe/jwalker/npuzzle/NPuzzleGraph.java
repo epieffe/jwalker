@@ -48,22 +48,22 @@ public class NPuzzleGraph implements Graph<NPuzzle> {
         // move up
         if (node.emptyRow() > 0) {
             int newEmptyIndex = (node.emptyRow() - 1) * node.size + node.emptyCol();
-            edgeList.add(new Edge<>("UP", 1, swapEmptyCell(node, newEmptyIndex)));
+            edgeList.add(new Edge<>(swapEmptyCell(node, newEmptyIndex), 1, "UP"));
         }
         // move down
         if (node.emptyRow() < node.size - 1) {
             int newEmptyIndex = (node.emptyRow() + 1) * node.size + node.emptyCol();
-            edgeList.add(new Edge<>("DOWN", 1, swapEmptyCell(node, newEmptyIndex)));
+            edgeList.add(new Edge<>(swapEmptyCell(node, newEmptyIndex), 1, "DOWN"));
         }
         // move left
         if (node.emptyCol() > 0) {
             int newEmptyIndex = node.emptyRow() * node.size + (node.emptyCol() - 1);
-            edgeList.add(new Edge<>("LEFT", 1, swapEmptyCell(node, newEmptyIndex)));
+            edgeList.add(new Edge<>(swapEmptyCell(node, newEmptyIndex), 1, "LEFT"));
         }
         // move right
         if (node.emptyCol() < node.size - 1) {
             int newEmptyIndex = node.emptyRow() * node.size + (node.emptyCol() + 1);
-            edgeList.add(new Edge<>("RIGHT", 1, swapEmptyCell(node, newEmptyIndex)));
+            edgeList.add(new Edge<>(swapEmptyCell(node, newEmptyIndex), 1, "RIGHT"));
         }
 
         return edgeList;
