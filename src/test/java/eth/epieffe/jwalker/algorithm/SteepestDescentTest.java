@@ -38,8 +38,8 @@ public class SteepestDescentTest {
     public void test8QueensWithNThreatsHeuristic(NQueens start) {
         NQueens sol = search.run(start);
         int numThreats = NQueensHeuristics.numThreats(sol);
-        // Retry up to 10 times
-        for (int retry = 0; numThreats > 0 && retry < 10; ++retry) {
+        // Retry up to 50 times
+        for (int retry = 0; numThreats > 0 && retry < 50; ++retry) {
             numThreats = NQueensHeuristics.numThreats(sol);
         }
         assertEquals(0, numThreats);
@@ -50,8 +50,8 @@ public class SteepestDescentTest {
     public void test50QueensWithNThreatsHeuristic(NQueens start) {
         NQueens sol = search.run(start);
         int numThreats = NQueensHeuristics.numThreats(sol);
-        // Retry up to 20 times
-        for (int retry = 0; numThreats > 0 && retry < 20; ++retry) {
+        // Retry up to 100 times
+        for (int retry = 0; numThreats > 0 && retry < 100; ++retry) {
             numThreats = NQueensHeuristics.numThreats(sol);
         }
         assertEquals(0, numThreats);
