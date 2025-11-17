@@ -194,7 +194,7 @@ A [Visit](src/main/java/eth/epieffe/jwalker/Visit.java) traverses a graph to fin
 - Dijkstra ([Wikipedia](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm))
 - Best First ([Wikipedia](https://en.wikipedia.org/wiki/Best-first_search))
 - IDA* ([Wikipedia](https://en.wikipedia.org/wiki/Iterative_deepening_A*))
-- Parallel IDA* ([Research paper](https://en.wikipedia.org/wiki/Parallel_iterative_deepening_A*))
+- Parallel IDA* ([Research paper](https://cdn.aaai.org/AAAI/1987/AAAI87-032.pdf))
 - IDDFS ([Wikipedia](https://en.wikipedia.org/wiki/Iterative_deepening_depth-first_search))
 - BFS ([Wikipedia](https://en.wikipedia.org/wiki/Breadth-first_search))
 
